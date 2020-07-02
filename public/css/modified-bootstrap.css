@@ -1,0 +1,8 @@
+.card-link {
+	color: #445252;
+}
+
+.card-link:hover {
+	text-decoration: none;
+	color: blue;
+}

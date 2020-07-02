@@ -1,0 +1,48 @@
+<script src="/js/tinymce/tinymce.min.js"></script>
+<script>
+    tinymce.init({
+        selector: '#answer',
+    });
+</script>
+<div class="container container-forum">
+    <div class="row">
+        <div class="col-md-10 mx-auto" style="margin-top: 50px;">
+            
+            {{#if question}}
+                <form action="/questions/{{question._id}}/answer" method="POST" class="form-border">
+                
+                    <h3 class="text-center"> <a href="/questions/{{question._id}}" class="text-primary text-capitalize text-decoration-none"> {{question.content}} </a> </h3>
+
+                    {{#if successMessage}}
+                        <div class="alert alert-success text-center">
+                            {{successMessage}}
+                        </div>
+                    {{/if}}
+                    
+                    <div class="form-group mb-4">
+                        <label for="answer">Your answer</label>
+                        <textarea class="form-control" name="answer" id="answer" placeholder="answer" rows="15"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-block text-capitalize"
+                        style="background-color: #324f6c;
+                        color: white;
+                        font-weight: 300;
+                        font-size: larger;"
+                    >
+                        answer
+                    </button>
+
+                </form>
+            {{else}}
+                <div class="alert alert-warning">
+                    <h1 class="text-capitalize text-center">question does not exist!</h1>
+                </div>
+
+            {{/if}}
+
+           
+
+        </div>
+    </div>
+</div>

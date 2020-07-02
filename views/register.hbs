@@ -1,0 +1,62 @@
+<div class="container container-forum">
+    <div class="row">
+        <div class="col-md-7 mx-auto" style="margin-top: 50px;">
+            <div class="card">
+
+                <div class="card-header login-register-card-header" style="	background-color: #57b846;">
+                    Register
+                </div>
+                
+                <div class="card-body">
+                    {{#if successMessage}}
+                        <div class="alert alert-success text-center">
+                            {{successMessage}} <br>
+                            <a href="/users/login"> Login </a>
+                        </div>
+                    {{/if}}
+
+                    {{#if errors}}
+                        {{#each errors}}
+                            <div class="alert alert-danger text-center">
+                                {{this.msg}}
+                            </div>
+                        {{/each}}
+                    {{/if}}
+
+                    <form action="/users/register" method="POST" enctype="multipart/form-data" class="mx-auto" style="dipslay:inline-block;width:400px">
+
+                        <div class="form-group mb-4">
+                            <input type="text" name="firstName" placeholder="firstName" class="form-control login-register-input" required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <input type="text" name="lastName" placeholder="lastname" class="form-control login-register-input" required>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <input type="email" name="email" placeholder="email" class="form-control login-register-input" required>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <input type="password" name="password" placeholder="password" class="form-control login-register-input">
+                        </div>
+                        
+                        <div class="custom-file mb-4">
+                            <input type="file" name="image" class="custom-file-input" id="validatedCustomFile" required>
+                            <label class="custom-file-label" for="validatedCustomFile">choose profile picture</label>
+                            {{!-- <div class="invalid-feedback">Example invalid custom file feedback</div> --}}
+                        
+                        </div>
+                        
+                        {{!-- <br> --}}
+                        
+                        <button class="btn btn-block text-capitalize mt-4 login-register-btn-submit" name="registration_submit" style="background-color: #57b846;"> <i class="fas fa-user-plus"></i> sign in</button>
+                    </form>
+
+                    <p class="login-register-have-account-link">have an account?</p>
+                    <p style="text-align: center;"><a href="/users/login" class="login-register-bottom-link" style="color: #57b846;">log in now</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

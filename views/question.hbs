@@ -1,0 +1,188 @@
+
+
+<div class="container container-forum">
+	<div class="row">
+		
+
+
+		<!-- QUESTION AND ITS ANSWERS SECTION -->
+		<div class="col-lg-7 col-md-7 col-sm-12" style="margin-right: 20px;">
+			<div class="row">
+                
+                {{!-- if question exists --}}
+                {{#if question}}
+                    {{!-- question section --}}
+                    <div class="col-lg-12 col-md-12 col-sm-12 bg-white rounded div-answer">
+                        <h2 class="font-weight-bold">
+                            <a href="/questions/{{question._id}}"> {{question.content}} </a> 
+                        </h2>
+                        <p>
+                            <span style="color:#445252;">
+                                <img src="/images/icons/timeIcon.png">
+                                {{question.creationDate}}
+                            </span>
+                        </p>
+                        <p class="">By <a href="/users/{{question.user._id}}" class=" text-capitalize font-weight-bold"> {{question.user.firstName}} {{question.user.lastName}} </a> </p>
+                        
+
+                        <!-- add an answer -->
+                            {{#if connectedUser}}
+                                <p class="float-right h5">
+                                    <a href="/questions/{{question._id}}/answer" class="text-muted">
+                                        <img src="/images/icons/iconWriteAnswer.png">
+                                        answer
+                                    </a>
+                                </p>
+                            {{/if}}                              
+                        <!-- /add an answer -->
+
+                    </div>
+                {{else}}
+                     <div class="col-sm-12 alert alert-warning rounded">
+                        <h1>question n'est pas trouvé!</h1>
+                    </div>
+                {{/if}}                    
+				
+
+
+
+				<hr>
+    
+                {{!-- there are some answers for this question --}}
+                {{#if question.answers }}
+                    {{#each question.answers}}
+                        <div class="col-lg-12 col-md-12 col-sm-12 bg-white rounded div-answer">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 90px;">
+                                            <img src="/images/users-images/{{this.user.imageName}}" class="img-fluid rounded img-profil"> 
+                                        </th>
+                                        <th>
+
+                                            <h3 class="text-capitalize"> <a href="/users/{{this.user._id}}"> {{this.user.firstName}} {{this.user.lastName}} </a></h3>
+                                            <p>
+                                                <span style="color:#445252;">
+                                                    <img src="/images/icons/timeIcon.png">
+                                                    {{this.creationDate}}
+                                                </span>
+                                            </p>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                            <div>
+                                {{{this.content}}}
+                            </div>
+
+                            {{!-- like answer section --}}
+                            <div class="d-flex justify-content-start mb-2">
+                                {{#if ../connectedUser}}
+                                    <img src="" alt="like/unlike icon" class="icon-like-unlike">
+                                {{/if}}
+                                <span class="ml-2 text-muted span-likes-number"> {{this.usersWhoLike.length}} </span>
+                            </div>
+
+                               
+
+
+                            
+                        </div>
+                    {{/each}}
+                    
+                {{else}}
+                    <div class="col-sm-12 alert alert-warning">
+						<h1 class="text-center text-capitalize">Oups! there are no answers for this question! be the first to answer.</h1>
+					</div> 
+                {{/if}}
+                
+				
+				
+		
+				
+			</div> 
+		</div> 
+        {{!-- /QUESTION AND ITS ANSWERS SECTION --}}
+		
+		
+
+
+
+
+
+
+
+
+
+		{{!-- SIDEBAR: other questions  --}}
+		<div class="col-lg-4 col-md-4 .d-sm-none .d-md-block .d-none .d-sm-block">
+			<div class="row">
+				<div class="col-lg-12 col-md-12">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">other questions</h5>
+                            {{#if question.topic.questions}}
+                                {{#each question.topic.questions}}
+                                    <p>
+                                        <a href="/questions/{{this._id}}" class="card-link"> {{this.content}} </a>
+                                    </p> 
+                                {{/each}}
+                            {{/if}}
+                            {{!-- <p>not implemneted yet!!!!!!!!!!</p> --}}
+						</div>
+					</div>	
+				</div>
+
+			</div> 
+        </div>
+        {{!-- /SIDEBAR: other questions --}}
+	
+
+
+
+
+	</div> <!-- end of main row -->
+</div> <!-- end of main container -->
+	
+
+<script>
+    const iconsLikingArray = document.querySelectorAll(".icon-like-unlike")
+    const spanLikesNumberArray = document.querySelectorAll(".span-likes-number")
+
+    //user is conn and there are some answers
+    if(iconsLikingArray.length !== 0){
+        const connectedUser = JSON.parse('{{{json connectedUser}}}')
+
+        const answersIds = JSON.parse('{{{json answersIds}}}')
+
+        for(let i = 0; i < answersIds.length; i++){
+            const isLiking = connectedUser.answersLiked.includes(answersIds[i])
+            iconsLikingArray[i].src = "/images/icons/" + (isLiking ? "liked.svg" : "not-liked.svg" ) 
+        }
+
+        for(let i = 0; i < answersIds.length; i++){
+            iconsLikingArray[i].addEventListener("click", async (e) => {
+
+                console.log(answersIds[i])
+
+                const response = await fetch("/answers/like-unlike", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json;charset=utf-8",
+                    },
+                    body: JSON.stringify({
+                        answerId: answersIds[i]
+                    }),
+                })
+
+                if(response.ok){
+                    const jsonResult = await response.json()
+                    //console.log(jsonResult)
+
+                    spanLikesNumberArray[i].textContent = jsonResult.answer.usersWhoLike.length
+                    iconsLikingArray[i].src = "/images/icons/" + (jsonResult.isLiking ? "liked.svg" : "not-liked.svg")
+                }
+            })
+        }
+    }
+</script>

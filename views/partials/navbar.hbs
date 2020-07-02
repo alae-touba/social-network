@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color:#324f6c;">
+    <div class="container">
+        <a class="navbar-brand" href="/topics">
+            <img src="/images/icons/forum-32.png" width="38" height="38" alt="websiteLogo">
+            MySite
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/topics">Topics</a>
+                </li>
+                {{#if connectedUser}}
+                    <li> <a class="nav-link text-capitalize" href="/users/{{connectedUser._id}}">{{connectedUser.firstName}} {{connectedUser.lastName}}</a> </li>
+                {{/if}}
+            </ul>
+
+
+            {{#if connectedUser}}
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="/images/icons/studentIcon.png">
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="/users/{{connectedUser._id}}">{{connectedUser.firstName}} {{connectedUser.lastName}}</a>
+                            <div class="dropdown-divider"></div>
+                            <form action="/users/logout?_method=DELETE" method="POST">
+                                <button class="dropdown-item" type="submit">Log Out</button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+            {{else}}
+                <div class="ml-auto">
+                    <a href="/users/login" class="btn btn-primary text-white">log in</a>
+                    <a href="/users/register" class="btn btn-success text-white">register</a>
+                    
+                </div>
+            {{/if}}
+            
+        </div>
+    </div>
+</nav>

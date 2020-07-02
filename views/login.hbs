@@ -1,0 +1,39 @@
+<div class="container container-forum">
+    <div class="row">
+        <div class="col-md-7 mx-auto" style="margin-top: 50px;">
+            <div class="card" >
+
+                <div class="card-header login-register-card-header" style="background-color: #007bff;">
+                    log in
+                </div>
+
+                    
+
+                <div class="card-body">
+
+                    {{#if messages.error}}
+                        <div class="alert alert-danger text-center">
+                            {{messages.error}}
+                        </div>
+                    {{/if}}
+    
+                    <form action="/users/login" method="POST" class="mx-auto" style="dipslay:inline-block;width:400px">
+                        <div class="form-group mb-4">
+                            <input type="email" name="email" placeholder="email" rquired class="form-control login-register-input">
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <input type="password" name="password" required placeholder="password" class="form-control login-register-input">
+                        </div>
+                        
+                        <button class="btn btn-block text-capitalize mt-4 login-register-btn-submit" style="background-color: #007bff;"> <i class="fas fa-sign-in-alt" type="submit"></i> log in</button>
+                    </form>
+
+                    <p class="login-register-have-account-link">dont have an account?</p>
+                    <p style="text-align: center;"><a href="/users/register" class="login-register-bottom-link" style="color: #0d4c87;"> register now </a></p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

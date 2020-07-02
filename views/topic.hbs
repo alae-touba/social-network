@@ -1,0 +1,304 @@
+
+
+<div class="container-fluid" id="container-question-page">
+    <div class="row justify-content-center">
+
+        <!-- followed topics -->
+        <div class="col-lg-2 d-none d-xl-block d-none d-lg-block d-xl-none">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-capitalize">following</h5>
+                            
+                            {{#if connectedUser}}
+                                {{#if connectedUser.topicsFollowed}}
+                                    {{#each connectedUser.topicsFollowed}}
+                                        <p>
+                                            <a href="/topics/{{this._id}}" class="card-link text-capitalize">
+                                                <img src="/images/topics-images/{{this.imageName}}" class="rounded img-sidebar">
+                                                {{this.name}}
+                                            </a>
+                                        </p>
+                                    {{/each}}
+                                {{else}}
+                                    <p class="text-info">
+                                        <img src="/images/icons/infoIcon24px.png">
+                                        you do not follow any topic!
+                                    </p>
+                                {{/if}}
+                            {{/if}}
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end followed topics -->
+
+
+        {{!-- MAIN CONTENT = TOPIC + QUESTIONS + ANSWERS --}}
+        <div class="col-lg-7 col-md-12 col-sm-12">
+
+            {{!-- TOPIC SECTION --}}
+            {{#if topic}}
+                <div class="row bg-white rounded" id="div-topic-section">
+                    <div class="col-lg-4 col-md-3 col-sm-12">
+                        <h2 class="font-weight-bold text-italic text-capitalize"> {{topic.name}} </h2>
+                        <img src="/images/topics-images/{{topic.imageName}}" class="rounded img-thumbnail img-fluid" width="260" height="180">
+                    </div>
+
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        {{!-- <h2 class="font-weight-bold text-italic text-capitalize"> {{topic.name}} </h2> --}}
+
+                        <p class="mt-5">
+                            {{topic.description}}
+                        </p>
+
+                        {{#if connectedUser}}
+                            <div class="d-flex justify-content-start mt-3">                       
+                                
+                                    <button id="btn-follow-unfollow">
+                                        <img src="" alt="" width="20px" height="20px" id="img-follow-unfollow"/>
+                                        <span class="text-capitalize font-weight-bold" id="span-follow-unfollow"></span>
+                                        <span id="span-number-followers"> {{topic.usersFollowers.length}} </span>
+                                    </button>
+                                     <p class="h5 pt-1 ml-4">
+                                        <a href="/topics/{{topic._id}}/question"  class="text-muted" {{!--style="position: absolute; bottom:10px;"--}} >
+                                            <img src="/images/icons/iconWriteAnswer.png">
+                                            ask a question
+                                        </a>
+                                    </p>
+                            </div>
+                        {{/if}}
+                    </div>
+
+                </div>
+            
+            {{else}}
+                <div class="alert alert-warning">
+                    <h1 class="text-conter text-capitalize">topic does not exist!</h1>
+                </div>
+            {{/if}}
+            {{!-- /TOPIC SECTION --}}
+
+
+
+            <hr>
+
+
+            {{!-- QUESTIONS AND ANSWERS SECTION --}}
+            {{!-- if there is some questions in this topic --}}
+            {{#if topic}}
+                {{#if topic.questions}}
+                    <div class="row">
+                        {{#each topic.questions}}
+                            <div class="col-lg-12 col-md-12 col-sm-12 bg-white rounded div-question">
+                                <h2> <a href="/questions/{{this._id}}" class="font-weight-bold"> {{upperFirstChar this.content}} </a></h2>
+
+                                {{!-- if there are some answers for this question --}}
+                                {{#if this.answers}}
+                                    {{#each this.answers}} 
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 90px;">
+                                                        <img src="/images/users-images/{{this.user.imageName}}" class="img-fluid rounded img-profil">
+                                                    </th>
+                                                    <th>
+                                                        <h3 class="text-capitalize"> <a href="/users/{{this.user._id}}"> {{this.user.firstName}} {{this.user.lastName}} </a> </h3>
+                                                        <p>
+                                                            <span style="color:#445252;">
+                                                                <img src="/images/icons/timeIcon.png">
+                                                                {{this.creationDate}}
+                                                            </span>
+                                                        </p>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <p>
+                                            {{{this.content}}}
+                                            {{!-- <a href="#" class="text-primary read-more">(lire la suite)</a> --}}
+                                        </p>
+
+                                        {{!-- like answer section --}}
+                                        <div class="d-flex justify-content-start mb-2">
+                                            {{#if ../../connectedUser}}
+                                                <img src="" alt="like/unlike icon" class="icon-like-unlike">
+                                            {{/if}}
+                                            <span class="ml-2 text-muted span-likes-number"> {{this.usersWhoLike.length}} </span>
+                                        </div>
+
+                                    {{/each}}
+                                
+                                {{else}}
+                                    <div class="alert alert-warning">Oups! there are no answers for this question! be the first to answer. </div>
+                                {{/if}}
+                                
+                            </div>
+                        {{/each}}
+                        
+
+                    </div>
+                {{else}}
+                    <div class="alert alert-warning">
+                        <h1 class="text-capitalize text-center">Oups! There are no questions for this topic!</h1>
+                    </div>
+                {{/if}}
+            {{/if}}
+            {{!-- /QUESTIONS AND ANSWERS SECTION --}}
+            
+
+        </div>
+        {{!-- /MAIN CONTENT = TOPIC + QUESTIONS + ANSWERS --}}
+
+
+
+        {{!-- other topics (sort based on higher number of followers) --}}
+        <div class="col-lg-2 d-none d-xl-block d-none d-lg-block d-xl-none">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-capitalize">other topics</h5>
+                                {{!-- if user is conn, i may want to select for example only topics that he does not follow --}}
+
+                                {{#if otherTopics}}
+                                    {{#each otherTopics}}
+                                         <p>
+                                            <a href="/topics/{{this._id}}" class="card-link">
+                                                <img src="/images/topics-images/{{this.imageName}}" class="rounded img-sidebar">
+                                                {{this.name}}
+                                            </a>
+                                        </p>
+                                    {{/each}}
+                                {{/if}}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{!-- /other topics --}}
+
+
+    </div> <!-- end main row -->
+</div> <!-- end main container -->
+
+<script>
+
+    //HANDLING FOLLOWING TOPICS
+    const btnFollowUnfollow = document.getElementById("btn-follow-unfollow")
+    const spanNumberFollowers = document.getElementById("span-number-followers")
+    const spanFollowUnfollow = document.getElementById("span-follow-unfollow")
+    const imgFollowUnfollow = document.getElementById("img-follow-unfollow")
+
+    const unfollowTextColor = "#636466" 
+    const followTextColor = "#2e69ff"
+
+    /*
+        if user is not conn
+            btnFollowUnfollow will be null
+        else
+            btnFollowUnfollow will not be null 
+    */
+    if(btnFollowUnfollow){
+        const topicId = window.location.pathname.split("/")[2]
+        const isFollowing = JSON.parse('{{{json isFollowing}}}').value
+        
+
+        updateFollowingSection(isFollowing)
+       
+
+        btnFollowUnfollow.addEventListener("click", async (e) => {
+            e.preventDefault()
+            //console.log('alae')
+            
+            const response = await fetch("http://localhost:3000/topics/follow-unfollow", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json;charset=utf-8",
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    topicId
+                    //topicId: JSON.parse('{{{json topic}}}')._id
+                }),
+            })
+
+            if(response.ok){
+                console.log(imgFollowUnfollow.src)
+                const jsonResult = await response.json()
+                //console.log(jsonResult)
+
+                spanNumberFollowers.textContent = jsonResult.topic.usersFollowers.length
+                //spanFollowUnfollow.textContent = jsonResult.isFollowing ? "unfollow" : "follow"
+                updateFollowingSection(jsonResult.isFollowing)
+            }
+            
+        })
+
+
+        function updateFollowingSection(isFollowing){
+            if(isFollowing){
+                btnFollowUnfollow.className = "btn-unfollow"
+                imgFollowUnfollow.src = "/images/icons/unfollow.svg"
+                spanNumberFollowers.style.color = unfollowTextColor
+                spanFollowUnfollow.style.color = unfollowTextColor
+                spanFollowUnfollow.textContent = "unfollow"
+            }else{
+                btnFollowUnfollow.className = "btn-follow"
+                imgFollowUnfollow.src = "/images/icons/follow.svg"
+                spanNumberFollowers.style.color = followTextColor
+                spanFollowUnfollow.style.color = followTextColor
+                spanFollowUnfollow.textContent = "follow"
+            }
+        }
+        
+        
+    }
+
+
+    //HANDLING LIKING ANSWERS
+    const iconsLikingArray = document.querySelectorAll(".icon-like-unlike")
+    const spanLikesNumberArray = document.querySelectorAll(".span-likes-number")
+
+    //user is conn and there are some answers
+    if(iconsLikingArray.length !== 0){
+        //const connectedUser = JSON.parse('{{{json connectedUser}}}')
+        const connectedUserAnswersLiked = JSON.parse('{{{json connectedUserAnswersLiked}}}')
+        const answersIds = JSON.parse('{{{json answersIds}}}')
+
+        for(let i = 0; i < answersIds.length; i++){
+            //const isLiking = connectedUser.answersLiked.includes(answersIds[i])
+            const isLiking = connectedUserAnswersLiked.includes(answersIds[i])
+            iconsLikingArray[i].src = "/images/icons/" + (isLiking ? "liked.svg" : "not-liked.svg" ) 
+        }
+
+        for(let i = 0; i < answersIds.length; i++){
+            iconsLikingArray[i].addEventListener("click", async (e) => {
+
+                const response = await fetch("/answers/like-unlike", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json;charset=utf-8",
+                    },
+                    body: JSON.stringify({
+                        answerId: answersIds[i]
+                    }),
+                })
+
+                if(response.ok){
+                    const jsonResult = await response.json()
+                    //console.log(jsonResult)
+
+                    spanLikesNumberArray[i].textContent = jsonResult.answer.usersWhoLike.length
+                    iconsLikingArray[i].src = "/images/icons/" + (jsonResult.isLiking ? "liked.svg" : "not-liked.svg")
+                }
+            })
+        }
+    }
+    
+  
+</script>
+

@@ -1,0 +1,39 @@
+
+{{!-- if query string === view own quesitions --}}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="text-capitalize">questions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#if user.questions}}
+            {{#each user.questions}}
+                <tr>
+                    <td>
+                        <a href="/questions/{{this._id}}">
+                            <p class="h4"> {{this.content}} </p>
+                        </a>
+
+                        <span class="text-muted"> <small> {{this.answers.length}} answer(s) </small> </span>
+                    </td>
+                </tr>
+            {{/each}}
+        {{else}}
+            <tr>
+                <td>
+                    <h4 class="text-info">
+                        <img src="/images/icons/infoIcon24px.png">
+                        {{#if isConnectedUserProfile}}
+                            you didnt ask any question!
+                        {{else}}
+
+                            {{user.firstName}} didnt ask any question!
+                        {{/if}}
+                    </h4> 
+                </td>
+            </tr>
+        {{/if}}
+    </tbody>
+</table>

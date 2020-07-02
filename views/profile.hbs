@@ -1,0 +1,108 @@
+
+
+<div class="container container-forum bg-white">
+
+
+		{{!-- correct id and user exists --}}
+		{{#if user}}
+			{{!-- picture and name section --}}
+			<div class="row justify-content-center" style="padding-top: 10px;">
+				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+					<img src="/images/users-images/{{user.imageName}}" class="img-fluid mx-auto d-block rounded">	
+				</div>
+
+				<div class="col-lg-8 col-md-8 col-sm-4 col-xs-12">
+					<h2 class="text-capitalize font-weight-bold font-italic"> {{user.firstName}} {{user.lastName}} </h2>
+					<h5>inscrit le {{user.registrationDate}} </h5>	
+				</div>
+			</div>
+
+			<hr>
+			
+
+			<div class="row">
+
+				{{!-- sidebar --}}
+				<div class="col-lg-4 col-md-4">
+					<div class="row">
+						<div class="col-lg-10 col-md-10">
+							<table class="table">
+								<thead>
+									<tr>
+										<th class="h4 text-capitalize">flux</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											<a href="/users/{{user._id}}/questions" class="text-muted text-capitalize"> {{user.questions.length}} question(<span class="text-lowercase">s</span>)</a>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<a href="/users/{{user._id}}/answers" class="text-muted text-capitalize"> {{user.answers.length}} answer(<span class="text-lowercase">s</span>)</a>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<a href="/users/{{user._id}}/topics" class="text-muted text-capitalize"> {{user.topics.length}} topic(<span class="text-lowercase">s</span>) created</a>
+										</td>
+									</tr>
+                                    <tr>
+										<td>
+											<a href="/users/{{user._id}}/topics-followed" class="text-muted text-capitalize"> {{user.topicsFollowed.length}} topic(<span class="text-lowercase">s</span>) followed</a>
+										</td>
+									</tr>
+
+								</tbody>
+							</table>	
+						</div>
+					</div>	
+				</div>
+				
+
+				{{!-- sidebar --}}
+				<div class="col-lg-8 col-md-8">
+					<div class="row">
+						<div class="col-lg-10 col-md-10">
+                            
+                            {{!-- what should be here is in tmp.hbs --}}
+							{{#if questions}}
+								{{>profile-includes/user-questions}}
+							{{/if}}
+
+							{{#if answers}}
+								{{>profile-includes/user-answers}}
+							{{/if}}
+
+							{{#if topics}}
+								{{>profile-includes/user-topics-created}}
+							{{/if}}
+
+							{{#if topicsFollowed}}
+								{{>profile-includes/user-topics-followed}}
+							{{/if}}
+			
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+		{{!-- wrong id format or correct format but user does not exist --}}
+        {{else}}
+			<div class="row">
+				<div class="col-sm-12 alert alert-warning mb-0" >
+					<h1 class="">User Does Not Exist!</h1>
+				</div>
+			</div>	
+			
+        {{/if}}
+		
+
+
+</div> 
+{{!-- /container --}}
+
+
+

@@ -1,0 +1,38 @@
+{{!-- else if query string === view followed topics --}}
+<table class="table">
+    <thead>
+        <tr>
+            <th class="text-capitalize">topics followed</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#if user.topicsFollowed}}
+            {{#each user.topicsFollowed}}
+                <tr>
+                    <td>
+                        <div class="float-left">
+                            <img src="/images/topics-images/{{this.imageName}}" width="32" height="32" class="rounded">
+                            <a href="/topics/{{this._id}}">
+                                <span class="text-left text-capitalize font-weight-bold" style="font-size: 16px;"> {{this.name}} </span>
+                            </a>	
+                        </div>
+                    </td>
+                </tr>
+            {{/each}}
+        {{else}}
+            <td>
+                <h4 class="text-info">
+                    <img src="/images/icons/infoIcon24px.png">
+                    {{#if isConnectedUserProfile}}
+                        you dont follow any topic!
+                    {{else}}
+
+                        {{user.firstName}} dont follow any topic!
+                    {{/if}}
+                </h4>
+            </td>
+        {{/if}}
+        
+        
+    </tbody>
+</table>

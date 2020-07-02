@@ -1,0 +1,39 @@
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="text-capitalize">answers</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#if user.answers}}
+            {{#each user.answers}}
+                <tr>
+                    <td>
+                        <a href="/questions/{{this.question._id}}">
+                            <p><p class=" h4 font-weight-bold"> {{this.question.content}} </p></p>
+                        </a>
+                        <span class="text-muted"> <img src="/images/icons/timeIcon.png"> {{this.creationDate}} </span>
+                        
+                        <p class="lead h6" style="color:#373b46 ;"> {{{this.content}}} </p>
+                    </td>
+                </tr>
+            {{/each}}
+        {{else}}
+            <tr>
+                <td>
+                    <h4 class="text-info">
+                        <img src="/images/icons/infoIcon24px.png">
+                        {{#if isConnectedUserProfile}}
+                            you didnt answer any question!
+                        {{else}}
+
+                            {{user.firstName}} didnt answer any question!
+                        {{/if}}
+                    </h4>
+                </td>
+            </tr>
+        {{/if}}            
+        
+    </tbody>
+</table>

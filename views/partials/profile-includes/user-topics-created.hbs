@@ -1,0 +1,40 @@
+ {{!-- else if query string === view own topics --}}
+<table class="table">
+    <thead>
+        <tr>
+            <th class="text-capitalize">topics created</th>
+        </tr>
+    </thead>
+    <tbody>         
+        {{#if user.topics}}
+            {{#each user.topics}}
+                <tr>
+                    <td>
+                        <div class="float-left">
+                            <img src="/images/topics-images/{{this.imageName}}" width="32" height="32" class="rounded">
+                            <a href="/topics/{{this._id}}">
+                                <span class="text-left text-capitalize font-weight-bold" style="font-size: 16px;"> {{this.name}} </span>
+                            </a>	
+                        </div>
+                    </td>
+                </tr>
+            {{/each}}
+            
+        {{else}}
+            <tr>
+                <td>
+                    <h4 class="text-info">
+                        <img src="/images/icons/infoIcon24px.png">
+                        {{#if isConnectedUserProfile}}
+                            you didnt create any topic!
+                        {{else}}
+
+                            {{user.firstName}} didnt create any topic!
+                        {{/if}}
+                    </h4>
+                </td>
+            </tr>
+        {{/if}}                           
+     
+    </tbody>
+</table>

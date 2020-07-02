@@ -1,0 +1,33 @@
+{
+	"name": "test",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"startdev": "nodemon server.js"
+	},
+	"dependencies": {
+		"@handlebars/allow-prototype-access": "^1.0.3",
+		"bcrypt": "^5.0.0",
+		"cookie-parser": "~1.4.4",
+		"debug": "~2.6.9",
+		"dotenv": "^8.2.0",
+		"express": "~4.16.1",
+		"express-flash": "0.0.2",
+		"express-handlebars": "^4.0.4",
+		"express-session": "^1.17.1",
+		"express-validator": "^6.6.0",
+		"handlebars": "^4.7.6",
+		"hbs": "^4.1.1",
+		"http-errors": "~1.6.3",
+		"method-override": "^3.0.0",
+		"mongoose": "^5.9.19",
+		"morgan": "~1.9.1",
+		"multer": "^1.4.2",
+		"passport": "^0.4.1",
+		"passport-local": "^1.0.0",
+		"tinymce": "^5.3.2"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.4"
+	}
+}

@@ -1,0 +1,49 @@
+<div class="container container-forum">
+    <div class="row">
+        <div class="col-md-10 mx-auto" style="margin-top: 50px;">
+
+            {{#if topic}}
+                <form action="/topics/{{topic._id}}/question" method="POST" class="form-border">
+                    <h3 class="text-center"><a href="/topics/{{topic._id}}" class="text-capitalize text-primary text-decoration-none"> {{topic.name}} </a> </h3>
+
+                    {{#if successMessage}}
+                        <div class="alert alert-success text-center">
+                            {{successMessage}}
+                        </div>
+                    {{/if}}
+
+
+                    {{#if errors}}
+                        {{#each errors}}
+                            <div class="alert alert-danger text-center">
+                                {{this.msg}}
+                            </div>
+                        {{/each}}
+                    {{/if}}
+
+
+
+    
+                    <div class="form-group mb-4">
+                        <label for="descritpion">Your question</label>
+                        <textarea class="form-control" name="question" id="description" placeholder="question" rows="3"></textarea>
+                    </div>
+
+                    <button class="btn btn-block text-capitalize" 
+                        style="background-color: #324f6c;
+                        color: white;
+                        font-weight: 300;
+                        font-size: larger;"
+                    >
+                        ask
+                    </button>
+
+                </form>
+            {{else}}
+                <div class="alert alert-warning">
+                    <h1 class="text-capitalize text-center">topic does not exist!</h1>
+                </div>
+            {{/if}}
+        </div>
+    </div>
+</div>

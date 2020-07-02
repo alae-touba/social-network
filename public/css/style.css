@@ -1,0 +1,133 @@
+body {
+	background-color: #e9eef3;
+}
+
+.container-forum {
+	margin-top: 85px;
+}
+
+body a {
+	text-decoration: none;
+	color: #333;
+}
+
+body a:hover {
+	text-decoration: underline;
+	color: #333;
+}
+
+/* index.php */
+
+/* topic.php */
+
+/* #btn-follow-unfollow:hover {
+	text-decoration: none;
+	color: blue;
+} */
+
+#container-question-page {
+	padding-right: 150px;
+	padding-left: 150px;
+	margin-top: 85px;
+}
+
+#div-topic-section {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+/*#div-topic-section img{
+	width: 150px;
+	height: 150px;
+}*/
+
+.img-sidebar {
+	width: 24px;
+	height: 24px;
+}
+
+#div-content {
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
+.div-question {
+	margin-bottom: 10px;
+}
+
+.div-question .img-profil {
+	margin-bottom: 13px;
+	width: 65px;
+	height: 65px;
+}
+
+/* question.php */
+.div-answer {
+	margin-bottom: 10px;
+}
+
+.div-answer .img-profil {
+	margin-bottom: 13px;
+	width: 65px;
+	height: 65px;
+}
+
+#btn-follow-unfollow {
+	border-radius: 16px;
+	padding: 7px 20px;
+	border-width: 0px;
+	/* position: absolute;
+	bottom: 40px; */
+}
+.btn-follow {
+	background-color: #ebeced;
+}
+
+.btn-unfollow {
+	background-color: #ebf0ff;
+}
+
+.div-topic {
+	margin: 10px;
+	overflow: hidden;
+}
+
+.login-register-card-header {
+	text-align: center;
+	color: white;
+	font-weight: bold;
+	text-transform: capitalize;
+	padding-top: 25px;
+	padding-bottom: 25px;
+}
+
+.login-register-input {
+	background-color: #f4f4f4;
+	color: black;
+	margin-top: 30px;
+	font-weight: 500;
+	padding: 20px 20px;
+}
+
+.login-register-btn-submit {
+	font-weight: bold;
+	color: white;
+	margin-bottom: 80px;
+}
+
+.login-register-bottom-link {
+	text-transform: uppercase;
+	font-weight: 600;
+}
+
+.login-register-have-account-link {
+	text-align: center;
+	color: gray;
+	font-weight: 500;
+}
+
+.form-border {
+	border: 1px solid #cfc4c4;
+	padding: 10px;
+	border-radius: 10px;
+}

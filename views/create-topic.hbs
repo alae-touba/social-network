@@ -1,0 +1,44 @@
+<div class="container container-forum">
+    <div class="row">
+        <div class="col-md-10 mx-auto" style="margin-top: 50px;">
+            <form action="/topics/create" method="POST" enctype="multipart/form-data" class="form-border">
+
+                        {{#if errors}}
+                            {{#each errors}}    
+                                <div class="alert alert-danger text-center">
+                                    {{this.msg}}
+                                </div>
+                            {{/each}}
+                        {{/if}}
+
+                        {{#if successMessage}}
+                        <div class="alert alert-success text-center">
+                            {{successMessage}}, <a href="/topics" class="text-primary">see all topics</a>
+                        </div>
+                        {{/if}}
+
+                <div class="form-group mb-4">
+                    <label for="name">name</label>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="name">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="descritpion">description</label>
+                    <textarea class="form-control" name="description" id="description" placeholder="description" rows="3"></textarea>
+                </div>
+
+                <div class="custom-file mb-4">
+                    <input type="file" name="image" class="custom-file-input" id="validatedCustomFile" required>
+                    <label class="custom-file-label" for="validatedCustomFile">choose the topic's picture</label>
+                    {{!-- <div class="invalid-feedback">Example invalid custom file feedback</div> --}}
+                </div>
+                
+                <button class="btn btn-block text-capitalize" name="submit_topic" 
+                style="background-color: #324f6c;
+                    color: white;
+                    font-weight: 300;
+    font-size: larger;">create topic</button>
+            </form>
+        </div>
+    </div>
+</div>
