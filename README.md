@@ -14,32 +14,32 @@ here is the _ERD_ for this app:
 
 ## Modeling data - relationships between the 4 models
 
-A user has many topics (create)
-A topic belongs to one user
+A user has many topics (create)\
+A topic belongs to one user \
 => one to many
 
-A user has many questions (ask)
-A question belongs to one user
+A user has many questions (ask) \
+A question belongs to one user \
 => one to many
 
-A user has many answers (answer)
-An answer belongs to one user
+A user has many answers (answer) \
+An answer belongs to one user \
 => one to many
 
-A topic has many questions
-A question belongs to one topic
+A topic has many questions \
+A question belongs to one topic \
 => one to many
 
-A question has many answers
-An answer belongs to one question
+A question has many answers \
+An answer belongs to one question \
 => one to many
 
-A user can follow many topics (follow)
-A topic has many followers
+A user can follow many topics (follow) \
+A topic has many followers \
 => many to many
 
-An answer has many users who like it
-A user can like many answers
+An answer has many users who like it \
+A user can like many answers \
 => many to many
 
 ---
