@@ -1,18 +1,32 @@
+# Table of content
+
+-   **[About](#about)**
+-   **[Entity Relationship Diagram](#entity-relationship-diagram)**
+-   **[Modeling Data - Relationships Between The 4 Models](#modeling-data-relationships-between-the-4-models)**
+-   **[Mongoose Schemas](#mongoose-schemas)**
+-   **[API](#api)**
+-   **[Test The App](#test-the-app)**
+-   **[How It Looks Like](#how-it-looks-like)**
+
+<a name="about"></a>
+
 # About
 
 This is a _question-and-answer_ social network website where users car create and follow different topics, they can ask questions in these topics, and also answer questions and like/dislike answers.
 
 Users can also track other users in the website to see what questions someone asked, what answers he/she gave, which topics they follow...etc
 
----
+<a name="entity-relationship-diagram"></a>
 
-## Entity relationship diagram
+# Entity Relationship Diagram
 
 here is the _ERD_ for this app:
 
 ![ERD](public/images/readme-images/entity-relationship-diagram.png)
 
-## Modeling data - relationships between the 4 models
+<a name="modeling-data-relationships-between-the-4-models"></a>
+
+# Modeling Data - Relationships Between The 4 Models
 
 A user has many topics (create)\
 A topic belongs to one user \
@@ -42,9 +56,9 @@ An answer has many users who like it \
 A user can like many answers \
 => many to many
 
----
+<a name="mongoose-schemas"></a>
 
-## Mongoose schemas
+# Mongoose Schemas
 
 I use two way (parent & child) referencing for all relationships:
 
@@ -102,7 +116,9 @@ Answers{
 
 ---
 
-## API
+<a name="api"></a>
+
+# API
 
 ```
 GET    /users
@@ -144,7 +160,9 @@ PATH   /answers/:id             //NIY
 
 (NIY <=> Not Implemented Yet )
 
-## Test the app
+<a name="test-the-app"></a>
+
+# Test The App
 
 ```
     npm install
@@ -153,9 +171,9 @@ PATH   /answers/:id             //NIY
 
 go to `localhost:3000`
 
----
+<a name="how-it-looks-like"></a>
 
-## How it looks like
+# How It Looks Like
 
 ![ERD](public/images/readme-images/1.png)
 
