@@ -12,9 +12,12 @@
 
 # About
 
-This is a _question-and-answer_ social network website where users car create and follow different topics, they can ask questions in these topics, and also answer questions and like/dislike answers.
+This is a _question-and-answer_ social network website where users can:
 
-Users can also track other users in the website to see what questions someone asked, what answers he/she gave, which topics they follow...etc
+-   create and follow different topics
+-   ask questions in these topics
+-   answer questions and like/dislike answers.
+-   track other users in the website to see what questions someone asked, what answers he/she gave, which topics they follow, ...etc
 
 <a name="entity-relationship-diagram"></a>
 
