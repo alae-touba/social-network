@@ -1,0 +1,229 @@
+[{
+  "_id": {
+    "$oid": "5efda552462a3025d1106a05"
+  },
+  "usersWhoLike": [
+    {
+      "$oid": "5efda187462a3025d11069f7"
+    },
+    {
+      "$oid": "5efda15c462a3025d11069f6"
+    },
+    {
+      "$oid": "5efda1a2462a3025d11069f8"
+    }
+  ],
+  "content": "<p>I will choose:</p>\r\n<p>for <em><strong>front end engineering</strong></em>: JavaScript/TypeScript (i know, they are just one)</p>\r\n<p>for <em><strong>back end engineering</strong></em>: OH, here you are, choose the two that suit you: Java/Python/Php/Node.js(runtime environment)/C#/Ruby/Go</p>\r\n<p>for <em><strong>native android apps</strong></em>: Java/Kotlin</p>\r\n<p>for <em><strong>native ios apps</strong></em>: swift/Objective-C</p>\r\n<p>for <em><strong>cross platform mobile apps</strong></em>: react native/Dart</p>\r\n<p>for <em><strong>data science/machine learning</strong></em>: Python/R</p>\r\n<p>for <em><strong>scripting</strong></em>: Python/Bash</p>\r\n<p>for <em><strong>desktop apps</strong></em>: C++/Java (can we put C# also?)</p>\r\n<p>for <em><strong>s</strong><strong>ystem programming</strong></em>: C/C++</p>\r\n<p>for <em><strong>game programming</strong></em>: C++/C#</p>",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "question": {
+    "$oid": "5efda39b462a3025d1106a02"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:13:54.778Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda603462a3025d1106a06"
+  },
+  "usersWhoLike": [
+    {
+      "$oid": "5efda187462a3025d11069f7"
+    },
+    {
+      "$oid": "5efda1a2462a3025d11069f8"
+    },
+    {
+      "$oid": "5efda15c462a3025d11069f6"
+    }
+  ],
+  "content": "<p>Here is how:</p> <p> suppose you have two entities: <span style=\"color: #169179;\"><strong>Student</strong></span> and <strong><span style=\"color: #169179;\">Subject.</span></strong> a student can study <strong>many</strong> subjects. And a subject can hav <strong>many</strong> student subscribed to it&nbsp; . </p>    <p> This is a <span style=\"text-decoration: underline;\"><em><strong><span style=\"color: #e03e2d; text-decoration: underline;\">many to many</span></strong></em></span> relationship </p>  <p> we will have an array named students that have for example: student_id, student_name, student_age. and an array named subjects: subject_id, subject_title, subject_hours. </p>    <p>to model the ManyToMany relationship we will have an additional array named <strong>students_subjects </strong>which will have two fields: <strong><em>student_id</em></strong> and <strong><em>subject_id.</em></strong></p><p>a record 1, 2 in this array means that the student with id 1 is subscribed to the subject with id 2.</p>",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "question": {
+    "$oid": "5efda360462a3025d1106a01"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:16:51.896Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda696462a3025d1106a07"
+  },
+  "usersWhoLike": [
+    {
+      "$oid": "5efda15c462a3025d11069f6"
+    }
+  ],
+  "content": "<h2><em><strong>O(n) </strong></em></h2>\r\n<p>(where n is the length of the data structure in which you want to search for an element) because at <em>worst</em> you will have to navigate throuh the whole DS to find (or not) your element.</p>",
+  "user": {
+    "$oid": "5efda187462a3025d11069f7"
+  },
+  "question": {
+    "$oid": "5efda3c5462a3025d1106a03"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:19:18.814Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda715462a3025d1106a08"
+  },
+  "usersWhoLike": [
+    {
+      "$oid": "5efda187462a3025d11069f7"
+    },
+    {
+      "$oid": "5efda15c462a3025d11069f6"
+    },
+    {
+      "$oid": "5efda1a2462a3025d11069f8"
+    }
+  ],
+  "content": "<p>At a basic level, <strong>programming</strong> is the process of<em> <span style=\"color: #000000;\">thinking of a solution to a problem </span></em>or <em>finding the right architecture/design for a software</em>&nbsp; or <em>writing the steps of an algorithm in pseudo code</em>, whereas <strong>coding</strong> is <em>just about writing code</em>. meaning translating what you have in mind (the solution to your problem for example) to some lines of code in a programming language.</p>",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "question": {
+    "$oid": "5efda32e462a3025d11069ff"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:21:25.314Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda83c462a3025d1106a09"
+  },
+  "usersWhoLike": [
+    {
+      "$oid": "5efda187462a3025d11069f7"
+    },
+    {
+      "$oid": "5efda15c462a3025d11069f6"
+    }
+  ],
+  "content": "<p>prototype based object oriented!</p>",
+  "user": {
+    "$oid": "5efda1a2462a3025d11069f8"
+  },
+  "question": {
+    "$oid": "5efda3f5462a3025d1106a04"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:26:20.608Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda8b8462a3025d1106a0a"
+  },
+  "usersWhoLike": [
+    {
+      "$oid": "5efda187462a3025d11069f7"
+    },
+    {
+      "$oid": "5efda15c462a3025d11069f6"
+    }
+  ],
+  "content": "<p><span style=\"font-family: 'andale mono', monospace;\">It is mainly used to<strong><span style=\"color: #3598db;\"> create dynamic/interactive web apps</span></strong> (front end engineering), but nowadays it is also used extensively for the <strong><span style=\"color: #e03e2d;\">back end with node.js</span></strong> and some framewoks such as express.</span></p>\r\n<p><span style=\"font-family: 'andale mono', monospace;\">it also used to create <span style=\"color: #e03e2d;\"><strong>cross platfrom mobile apps</strong></span> with react native, desktop apps with electron .. it has also many <span style=\"color: #3598db;\"><strong>machine learning</strong></span> libraries.</span></p>",
+  "user": {
+    "$oid": "5efda187462a3025d11069f7"
+  },
+  "question": {
+    "$oid": "5efda33d462a3025d1106a00"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:28:24.963Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efdba4cdf11cc35eb769996"
+  },
+  "usersWhoLike": [],
+  "content": "<p>front end.</p>",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "question": {
+    "$oid": "5efda33d462a3025d1106a00"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T10:43:24.694Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5f96dd21926f3f435fdba313"
+  },
+  "usersWhoLike": [],
+  "content": "<p>local variable type inference (the var keyword)</p>",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "question": {
+    "$oid": "5f96dcf1926f3f435fdba312"
+  },
+  "creationDate": {
+    "$date": "2020-10-26T14:28:49.701Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5f96e46c926f3f435fdba314"
+  },
+  "usersWhoLike": [],
+  "content": "<p>test</p>",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "question": {
+    "$oid": "5efda360462a3025d1106a01"
+  },
+  "creationDate": {
+    "$date": "2020-10-26T14:59:56.365Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5f98a3b4ba1ca64512914db6"
+  },
+  "usersWhoLike": [],
+  "content": "<p><span style=\"color: #169179;\"><em><strong>this is a test</strong></em></span></p>",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "question": {
+    "$oid": "5efda32e462a3025d11069ff"
+  },
+  "creationDate": {
+    "$date": "2020-10-27T22:48:20.906Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5fa7533a6c91e48bae820f2c"
+  },
+  "usersWhoLike": [
+    {
+      "$oid": "5efda15c462a3025d11069f6"
+    }
+  ],
+  "content": "<p><span style=\"color: #169179;\"><em><strong>testing</strong></em></span></p>",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "question": {
+    "$oid": "5efda39b462a3025d1106a02"
+  },
+  "creationDate": {
+    "$date": "2020-11-08T02:08:58.436Z"
+  },
+  "__v": 0
+}]

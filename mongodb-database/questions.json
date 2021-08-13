@@ -1,0 +1,233 @@
+[{
+  "_id": {
+    "$oid": "5efda32e462a3025d11069ff"
+  },
+  "answers": [
+    {
+      "$oid": "5efda715462a3025d1106a08"
+    },
+    {
+      "$oid": "5f98a3b4ba1ca64512914db6"
+    }
+  ],
+  "content": "whats the difference between programming and coding?",
+  "user": {
+    "$oid": "5efda1a2462a3025d11069f8"
+  },
+  "topic": {
+    "$oid": "5efda2b1462a3025d11069fd"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:04:46.142Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda33d462a3025d1106a00"
+  },
+  "answers": [
+    {
+      "$oid": "5efda8b8462a3025d1106a0a"
+    },
+    {
+      "$oid": "5efdba4cdf11cc35eb769996"
+    }
+  ],
+  "content": "where is JS mainly used?",
+  "user": {
+    "$oid": "5efda1a2462a3025d11069f8"
+  },
+  "topic": {
+    "$oid": "5efda2d3462a3025d11069fe"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:05:01.123Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda360462a3025d1106a01"
+  },
+  "answers": [
+    {
+      "$oid": "5efda603462a3025d1106a06"
+    },
+    {
+      "$oid": "5f96e46c926f3f435fdba314"
+    }
+  ],
+  "content": "how do you model a many to many relationship in a relational database management system such as MySql?",
+  "user": {
+    "$oid": "5efda1a2462a3025d11069f8"
+  },
+  "topic": {
+    "$oid": "5efda21f462a3025d11069fa"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:05:36.902Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda39b462a3025d1106a02"
+  },
+  "answers": [
+    {
+      "$oid": "5efda552462a3025d1106a05"
+    },
+    {
+      "$oid": "5fa7533a6c91e48bae820f2c"
+    }
+  ],
+  "content": "Can you name the best two programming languages for every area?",
+  "user": {
+    "$oid": "5efda187462a3025d11069f7"
+  },
+  "topic": {
+    "$oid": "5efda2b1462a3025d11069fd"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:06:35.495Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda3c5462a3025d1106a03"
+  },
+  "answers": [
+    {
+      "$oid": "5efda696462a3025d1106a07"
+    }
+  ],
+  "content": "whats the complexity of a linear search?",
+  "user": {
+    "$oid": "5efda187462a3025d11069f7"
+  },
+  "topic": {
+    "$oid": "5efda246462a3025d11069fb"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:07:17.387Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda3f5462a3025d1106a04"
+  },
+  "answers": [
+    {
+      "$oid": "5efda83c462a3025d1106a09"
+    }
+  ],
+  "content": "is Js class based OO or prototype based OO?",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "topic": {
+    "$oid": "5efda2d3462a3025d11069fe"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:08:05.827Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efdb99cdf11cc35eb769995"
+  },
+  "answers": [],
+  "content": "What are linear and non linear data structures?",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "topic": {
+    "$oid": "5efda274462a3025d11069fc"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T10:40:28.036Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efdde63b51dff37e50f4d01"
+  },
+  "answers": [],
+  "content": "What are the various types of relationships in Database? Define them.",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "topic": {
+    "$oid": "5efda21f462a3025d11069fa"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T13:17:23.881Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5f96dcf1926f3f435fdba312"
+  },
+  "answers": [
+    {
+      "$oid": "5f96dd21926f3f435fdba313"
+    }
+  ],
+  "content": "what is some important feature f java 10?",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "topic": {
+    "$oid": "5efda1ff462a3025d11069f9"
+  },
+  "creationDate": {
+    "$date": "2020-10-26T14:28:01.821Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5f98a3e2ba1ca64512914db7"
+  },
+  "answers": [],
+  "content": "can you explain hashing?",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "topic": {
+    "$oid": "5efda246462a3025d11069fb"
+  },
+  "creationDate": {
+    "$date": "2020-10-27T22:49:06.935Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5fa748dc6c91e48bae820f2a"
+  },
+  "answers": [],
+  "content": "what is a no sql database?",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "topic": {
+    "$oid": "5efda21f462a3025d11069fa"
+  },
+  "creationDate": {
+    "$date": "2020-11-08T01:24:44.088Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5fa7530f6c91e48bae820f2b"
+  },
+  "answers": [],
+  "content": "comment fonctionne le mot clé this?",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "topic": {
+    "$oid": "5efda2d3462a3025d11069fe"
+  },
+  "creationDate": {
+    "$date": "2020-11-08T02:08:15.663Z"
+  },
+  "__v": 0
+}]

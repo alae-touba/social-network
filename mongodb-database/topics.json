@@ -1,0 +1,184 @@
+[{
+  "_id": {
+    "$oid": "5efda1ff462a3025d11069f9"
+  },
+  "questions": [
+    {
+      "$oid": "5f96dcf1926f3f435fdba312"
+    }
+  ],
+  "usersFollowers": [
+    {
+      "$oid": "5efda1a2462a3025d11069f8"
+    },
+    {
+      "$oid": "5efda187462a3025d11069f7"
+    }
+  ],
+  "name": "java",
+  "description": "Java is a general-purpose programming language that is class-based, object-oriented, and designed to have as few implementation dependencies as possible. It is intended to let application developers write once, run anywhere (WORA).",
+  "imageName": "image-1593680383311.png",
+  "user": {
+    "$oid": "5efda1a2462a3025d11069f8"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T08:59:43.314Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda21f462a3025d11069fa"
+  },
+  "questions": [
+    {
+      "$oid": "5efda360462a3025d1106a01"
+    },
+    {
+      "$oid": "5efdde63b51dff37e50f4d01"
+    },
+    {
+      "$oid": "5fa748dc6c91e48bae820f2a"
+    }
+  ],
+  "usersFollowers": [
+    {
+      "$oid": "5efda187462a3025d11069f7"
+    },
+    {
+      "$oid": "5efda1a2462a3025d11069f8"
+    },
+    {
+      "$oid": "5efda15c462a3025d11069f6"
+    }
+  ],
+  "name": "Database design",
+  "description": "Database design is the organization of data according to a logical structure of a database. So the goal is to determine in which manner data can be stored, organized and manipulated. Database design involves classifying data and identifying relationships.",
+  "imageName": "image-1593680415229.png",
+  "user": {
+    "$oid": "5efda1a2462a3025d11069f8"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:00:15.236Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda246462a3025d11069fb"
+  },
+  "questions": [
+    {
+      "$oid": "5efda3c5462a3025d1106a03"
+    },
+    {
+      "$oid": "5f98a3e2ba1ca64512914db7"
+    }
+  ],
+  "usersFollowers": [
+    {
+      "$oid": "5efda1a2462a3025d11069f8"
+    }
+  ],
+  "name": "algorithms",
+  "description": "In mathematics and computer science, an algorithm is a finite sequence of well-defined instructions, typically to solve a class of problems such as doing some calculations, data processing, automated reasoning, and other tasks.",
+  "imageName": "image-1593680454047.png",
+  "user": {
+    "$oid": "5efda187462a3025d11069f7"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:00:54.053Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda274462a3025d11069fc"
+  },
+  "questions": [
+    {
+      "$oid": "5efdb99cdf11cc35eb769995"
+    }
+  ],
+  "usersFollowers": [
+    {
+      "$oid": "5efda187462a3025d11069f7"
+    }
+  ],
+  "name": "data structures",
+  "description": "A data structure is a data organization, management, and storage format that enables efficient access and modification. More precisely, a DS is a collection of data values, the relationships among them, and the operations that can be applied to the data. ",
+  "imageName": "image-1593680500501.png",
+  "user": {
+    "$oid": "5efda187462a3025d11069f7"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:01:40.504Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda2b1462a3025d11069fd"
+  },
+  "questions": [
+    {
+      "$oid": "5efda32e462a3025d11069ff"
+    },
+    {
+      "$oid": "5efda39b462a3025d1106a02"
+    }
+  ],
+  "usersFollowers": [
+    {
+      "$oid": "5efda1a2462a3025d11069f8"
+    },
+    {
+      "$oid": "5efda187462a3025d11069f7"
+    },
+    {
+      "$oid": "5efda15c462a3025d11069f6"
+    }
+  ],
+  "name": "programming",
+  "description": "Programming is the process of creating a set of instructions that tell a computer how to perform a task. Programming can be done using a variety of computer programming languages, such as JavaScript, Python, and C++.\r\n",
+  "imageName": "image-1593680561250.jpeg",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:02:41.263Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "5efda2d3462a3025d11069fe"
+  },
+  "questions": [
+    {
+      "$oid": "5efda33d462a3025d1106a00"
+    },
+    {
+      "$oid": "5efda3f5462a3025d1106a04"
+    },
+    {
+      "$oid": "5fa7530f6c91e48bae820f2b"
+    }
+  ],
+  "usersFollowers": [
+    {
+      "$oid": "5efda1a2462a3025d11069f8"
+    },
+    {
+      "$oid": "5efda187462a3025d11069f7"
+    },
+    {
+      "$oid": "5efda15c462a3025d11069f6"
+    }
+  ],
+  "name": "javascript",
+  "description": "JavaScript (JS) is a lightweight, interpreted, or just-in-time compiled programming language with first-class functions. While it is most well-known as the scripting language for Web pages, many non-browser environments also use it, such as Node.js.",
+  "imageName": "image-1593680595679.jpg",
+  "user": {
+    "$oid": "5efda15c462a3025d11069f6"
+  },
+  "creationDate": {
+    "$date": "2020-07-02T09:03:15.681Z"
+  },
+  "__v": 0
+}]
