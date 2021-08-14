@@ -1,0 +1,29 @@
+version: "3"
+services:
+    node-server:
+        build: .
+        restart: unless-stopped
+        ports:
+            - 3000:3000
+        links:
+            - mongodb
+        depends_on:
+            - mongodb
+    mongodb:
+        image: mongo
+        restart: unless-stopped
+        ports:
+            - 27017:27017
+        environment:
+            - MONGO_INITDB_DATABASE=social_network_db #database that will be created at startup
+        volumes: # Add your data to auto run on image startup (sh files inside docker-entrypoint-initdb.d will be run at startup)
+            - ./mongodb-database/:/docker-entrypoint-initdb.d/
+    mongo-express:
+        image: mongo-express
+        restart: unless-stopped
+        ports:
+            - 3001:8081
+        environment:
+            - ME_CONFIG_MONGODB_SERVER=mongodb
+        depends_on:
+            - mongodb
