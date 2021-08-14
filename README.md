@@ -6,6 +6,7 @@
 - [Mongoose Schemas](#mongoose-schemas)
 - [API](#api)
 - [Use it locally](#use-it-locally)
+  - [Using docker](#using-docker)
   - [Detailed steps on how to run the application locally in Linux](#detailed-steps-on-how-to-run-the-application-locally-in-linux)
   - [Detailed steps on how to run the application locally in Windows](#detailed-steps-on-how-to-run-the-application-locally-in-windows)
 - [How It Looks Like](#how-it-looks-like)
@@ -162,6 +163,23 @@ PATH   /answers/:id             //NIY
 
 
 # Use it locally
+
+## Using docker
+
+* Clone the project & unzip it
+* Open the project in the terminal
+* Run
+    ```bash
+    git checkout docker-branch
+    ```
+* Run 
+    ```bash
+    docker-compose -f docker-compose.yaml
+    ```
+
+* Open a browser & head to http://localhost:3001 to see the content of the database (**social_network_db**)
+* Visit http://localhost:3000 to see the app running
+
 
 ## Detailed steps on how to run the application locally in Linux
 
