@@ -13,7 +13,7 @@
 
 # About
 
-This is a _question-and-answer_ social network website where users can:
+This is a _question-and-answer_ social network website where users are able to:
 
 -   Create and follow different topics
 -   Ask questions in these topics
