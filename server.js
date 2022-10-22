@@ -21,13 +21,21 @@ const topicsRoutes = require("./routes/topicsRoutes")
 const app = express()
 
 //database setup
-mongoose.connect("mongodb://mongodb:27017/social_network_db", {
+const {
+	DB_USER,
+	DB_PASSWORD,
+	DB_HOST,
+	DB_PORT,
+	DB_NAME,
+} = process.env;
+
+mongoose.connect(`mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=admin`, {
 	useNewUrlParser: true,
 	useUnifiedTopology: true
 })
 const db = mongoose.connection
 db.on("error", (error) => console.error(error))
-db.once("open", () => console.log("Connected to Database"))
+db.once("open", () => console.log("Connected to Database " + DB_NAME))
 
 // view engine setup
 app.engine(
