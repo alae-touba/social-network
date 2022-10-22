@@ -9,7 +9,7 @@
   - [Using docker](#using-docker)
   - [Detailed steps on how to run the application locally in Linux](#detailed-steps-on-how-to-run-the-application-locally-in-linux)
   - [Detailed steps on how to run the application locally in Windows](#detailed-steps-on-how-to-run-the-application-locally-in-windows)
-- [How It Looks Like](#how-it-looks-like)
+- [How It Looks](#how-it-looks)
 
 # About
 
@@ -168,17 +168,35 @@ PATH   /answers/:id             //NIY
 
 * Clone the project & unzip it
 * Open the project in the terminal
-* Run
-    ```bash
-    git checkout docker-branch
-    ```
+
 * Run 
     ```bash
-    docker-compose -f docker-compose.yaml
+    docker compose up
     ```
 
-* Open a browser & head to http://localhost:3001 to see the content of the database (**social_network_db**)
-* Visit http://localhost:3000 to see the app running
+    if you watch the logs you may see this error:
+
+    ![ERD](public/images/readme-images/mongo-import-error.PNG)
+
+    This is related to EOL (end of line) difference between Windows & Linux systems. If you are cloning the project in Windows Machine, change the EOL for the file [mongodb-database/import-data.sh](./mongodb-database/import-data.sh) to be LF (\n).
+
+    In VSCODE you can do this easily by looking at the bottom menu when the file is opened.
+
+    ![ERD](public/images/readme-images/EOL.PNG)
+
+* Open a browser & head to http://localhost:8082 to see the content of the database (**social_network_db**)
+
+    you should see 4 collections (users, topics, quetions, answers), each one with some data in it.
+    
+    If its not the case, refer to previous step (error may be related to EOF for the [mongodb-database/import-data.sh](./mongodb-database/import-data.sh)).
+
+* Visit http://localhost:3001 to see the app running
+* You can log in to the website with a bunch of existing accounts: 
+    * alae@gmail.com/ alae
+    * hamza@gmail.com/hamza
+    * farid@gmail.com/farid
+
+    or just create one for you instead.
 
 
 ## Detailed steps on how to run the application locally in Linux
@@ -309,7 +327,7 @@ PATH   /answers/:id             //NIY
 
    
 
-# How It Looks Like
+# How It Looks
 
 ![ERD](public/images/readme-images/1.png)
 
