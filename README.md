@@ -188,7 +188,7 @@ PATH   /answers/:id             //NIY
 
     you should see 4 collections (users, topics, quetions, answers), each one with some data in it.
     
-    If its not the case, refer to previous step (error may be related to EOF for the [mongodb-database/import-data.sh](./mongodb-database/import-data.sh)).
+    If its not the case, refer to previous step (error may be related to EOL for the [mongodb-database/import-data.sh](./mongodb-database/import-data.sh)).
 
 * Visit http://localhost:3001 to see the app running
 * You can log in to the website with a bunch of existing accounts: 
