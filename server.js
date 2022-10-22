@@ -1,7 +1,3 @@
-if (process.env.NODE_ENV !== "production") {
-	require("dotenv").config({ path: "./config.env" })
-}
-
 const createError = require("http-errors")
 const express = require("express")
 const path = require("path")
@@ -25,10 +21,21 @@ const topicsRoutes = require("./routes/topicsRoutes")
 const app = express()
 
 //database setup
-mongoose.connect(process.env.DATABASE_LOCAL, { useNewUrlParser: true, useUnifiedTopology: true })
+const {
+	DB_USER,
+	DB_PASSWORD,
+	DB_HOST,
+	DB_PORT,
+	DB_NAME,
+} = process.env;
+
+mongoose.connect(`mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=admin`, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true
+})
 const db = mongoose.connection
 db.on("error", (error) => console.error(error))
-db.once("open", () => console.log("Connected to Database"))
+db.once("open", () => console.log("Connected to Database " + DB_NAME))
 
 // view engine setup
 app.engine(
@@ -108,4 +115,6 @@ app.use(function (err, req, res, next) {
 
 // module.exports = app
 const PORT = process.env.PORT || 3000
-app.listen(PORT, () => console.log(`app started in mode ${process.env.NODE_ENV},it is listening on port ${PORT}`))
+app.listen(PORT, () =>
+	console.log(`app started in mode ${process.env.NODE_ENV},it is listening on port ${PORT}`)
+)
