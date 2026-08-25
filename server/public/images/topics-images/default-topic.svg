@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260">
+  <rect width="400" height="260" fill="#3f6285"/>
+  <circle cx="330" cy="52" r="26" fill="#f0c95c"/>
+  <path d="M0 208l70-64 58 48 74-84 82 74 60-50v128H0z" fill="#5b83a8"/>
+  <text x="200" y="245" font-family="sans-serif" font-size="20" fill="#dfe7ef" text-anchor="middle">New Topic</text>
+</svg>

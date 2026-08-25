@@ -1,4 +1,8 @@
-node_modules/
-.gitignore
-.git/
-Dockerfile
+.git
+.env
+node_modules
+**/node_modules
+**/dist
+**/.angular
+docs
+*.log
