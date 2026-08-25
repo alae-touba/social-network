@@ -1,0 +1,23 @@
+<div class="auth-card card">
+	<h1>Log in</h1>
+
+	@if (error()) {
+		<div class="alert alert-error">{{ error() }}</div>
+	}
+
+	<form (submit)="$event.preventDefault(); submit()">
+		<div class="form-field">
+			<label for="email">Email</label>
+			<input id="email" type="email" name="email" required autocomplete="email" [value]="email()" (input)="email.set($any($event.target).value)" />
+		</div>
+		<div class="form-field">
+			<label for="password">Password</label>
+			<input id="password" type="password" name="password" required autocomplete="current-password" [value]="password()" (input)="password.set($any($event.target).value)" />
+		</div>
+		<button type="submit" class="btn btn-primary btn-block" [disabled]="submitting() || !email() || !password()">
+			{{ submitting() ? 'Logging in…' : 'Log in' }}
+		</button>
+	</form>
+
+	<p class="muted center">No account yet? <a routerLink="/register">Register now</a></p>
+</div>

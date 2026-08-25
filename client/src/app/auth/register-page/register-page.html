@@ -1,0 +1,41 @@
+<div class="auth-card card">
+	<h1>Create an account</h1>
+
+	@if (error()) {
+		<div class="alert alert-error">{{ error() }}</div>
+	}
+
+	<form (submit)="$event.preventDefault(); submit()">
+		<div class="form-row">
+			<div class="form-field">
+				<label for="firstName">First name</label>
+				<input id="firstName" name="firstName" required [value]="firstName()" (input)="firstName.set($any($event.target).value)" />
+			</div>
+			<div class="form-field">
+				<label for="lastName">Last name</label>
+				<input id="lastName" name="lastName" required [value]="lastName()" (input)="lastName.set($any($event.target).value)" />
+			</div>
+		</div>
+
+		<div class="form-field">
+			<label for="email">Email</label>
+			<input id="email" type="email" name="email" required autocomplete="email" [value]="email()" (input)="email.set($any($event.target).value)" />
+		</div>
+
+		<div class="form-field">
+			<label for="password">Password (at least 4 characters)</label>
+			<input id="password" type="password" name="password" required autocomplete="new-password" [value]="password()" (input)="password.set($any($event.target).value)" />
+		</div>
+
+		<div class="form-field">
+			<label for="image">Profile picture (optional)</label>
+			<input id="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" (change)="onImageChange($event)" />
+		</div>
+
+		<button type="submit" class="btn btn-success btn-block" [disabled]="submitting()">
+			{{ submitting() ? 'Creating account…' : 'Register' }}
+		</button>
+	</form>
+
+	<p class="muted center">Already have an account? <a routerLink="/login">Log in</a></p>
+</div>

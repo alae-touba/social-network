@@ -1,0 +1,51 @@
+.layout {
+	display: grid;
+	grid-template-columns: 1fr 260px;
+	gap: 1.25rem;
+	align-items: start;
+}
+
+@media (max-width: 900px) {
+	.layout {
+		grid-template-columns: 1fr;
+	}
+}
+
+.main {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.answer-form textarea {
+	width: 100%;
+	margin-bottom: 0.75rem;
+}
+
+.answer-row {
+	padding: 0.9rem 0;
+	border-top: 1px solid var(--color-border);
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.answer-row:first-of-type {
+	border-top: none;
+	padding-top: 0;
+}
+
+.like-btn {
+	background: none;
+	border: none;
+	font-size: 1.25rem;
+	line-height: 1;
+	cursor: pointer;
+	color: var(--color-muted);
+	padding: 0;
+	margin-right: 0.35rem;
+}
+
+.like-btn.is-liked {
+	color: #e0344a;
+}

@@ -1,0 +1,78 @@
+@if (loading()) {
+	<app-loading />
+} @else if (error()) {
+	<div class="alert alert-error">{{ error() }}</div>
+} @else if (profile(); as p) {
+	<header class="profile-header card">
+		<img class="avatar-lg" [src]="'/images/users-images/' + p.user.imageName" [alt]="p.user.firstName" />
+		<div>
+			<h1>{{ p.user.firstName }} {{ p.user.lastName }}</h1>
+			<p class="muted">Member since {{ p.user.registrationDate | date: 'longDate' }}</p>
+			@if (auth.currentUser()?.id === p.user.id) {
+				<p class="muted">This is you — {{ p.user.email }}</p>
+			}
+		</div>
+	</header>
+
+	<nav class="tabs">
+		@for (tab of tabs; track tab.key) {
+			<a
+				routerLink="."
+				[queryParams]="{ tab: tab.key }"
+				[class.active]="activeTab() === tab.key"
+			>
+				{{ tab.label }} ({{ itemCount(p, tab.key) }})
+			</a>
+		}
+	</nav>
+
+	<section class="card">
+		@switch (activeTab()) {
+			@case ('questions') {
+				@if (p.questions.length === 0) {
+					<p class="muted">No questions asked yet.</p>
+				}
+				@for (question of p.questions; track question.id) {
+					<article class="list-row">
+						<a [routerLink]="['/questions', question.id]">{{ question.content }}</a>
+						<span class="muted">in {{ question.topic.name }} · {{ question.creationDate | date: 'mediumDate' }}</span>
+					</article>
+				}
+			}
+			@case ('answers') {
+				@if (p.answers.length === 0) {
+					<p class="muted">No answers given yet.</p>
+				}
+				@for (answer of p.answers; track answer.id) {
+					<article class="list-row">
+						<a [routerLink]="['/questions', answer.question.id]">{{ answer.question.content }}</a>
+						<span class="muted">answered {{ answer.creationDate | date: 'mediumDate' }}</span>
+						<div class="snippet" [innerHTML]="answer.content | safeContent"></div>
+					</article>
+				}
+			}
+			@case ('topics') {
+				@if (p.topicsCreated.length === 0) {
+					<p class="muted">Has not created any topics yet.</p>
+				}
+				@for (topic of p.topicsCreated; track topic.id) {
+					<article class="list-row">
+						<a [routerLink]="['/topics', topic.id]">{{ topic.name }}</a>
+						<span class="muted">{{ topic.followerCount }} follower(s)</span>
+					</article>
+				}
+			}
+			@case ('followed') {
+				@if (p.topicsFollowed.length === 0) {
+					<p class="muted">Does not follow any topics yet.</p>
+				}
+				@for (topic of p.topicsFollowed; track topic.id) {
+					<article class="list-row">
+						<a [routerLink]="['/topics', topic.id]">{{ topic.name }}</a>
+						<span class="muted">{{ topic.followerCount }} follower(s)</span>
+					</article>
+				}
+			}
+		}
+	</section>
+}

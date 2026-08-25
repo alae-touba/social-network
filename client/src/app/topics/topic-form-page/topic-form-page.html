@@ -1,0 +1,36 @@
+<header class="page-header">
+	<h1>Create a topic</h1>
+	<a routerLink="/topics" class="btn btn-ghost">← Back</a>
+</header>
+
+<form class="card form" (submit)="$event.preventDefault(); submit()">
+	@if (error()) {
+		<div class="alert alert-error">{{ error() }}</div>
+	}
+
+	<div class="form-field">
+		<label for="name">Name</label>
+		<input id="name" name="name" [value]="name()" (input)="name.set($any($event.target).value)" placeholder="e.g. javascript" />
+	</div>
+
+	<div class="form-field">
+		<label for="description">Description (20–255 characters)</label>
+		<textarea
+			id="description"
+			name="description"
+			rows="4"
+			[value]="description()"
+			(input)="description.set($any($event.target).value)"
+			placeholder="What is this topic about?"
+		></textarea>
+	</div>
+
+	<div class="form-field">
+		<label for="image">Cover image (optional)</label>
+		<input id="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" (change)="onImageChange($event)" />
+	</div>
+
+	<button type="submit" class="btn btn-success" [disabled]="submitting()">
+		{{ submitting() ? 'Creating…' : 'Create topic' }}
+	</button>
+</form>

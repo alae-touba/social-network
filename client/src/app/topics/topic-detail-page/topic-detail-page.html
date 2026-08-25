@@ -1,0 +1,106 @@
+@if (loading()) {
+	<app-loading />
+} @else if (error()) {
+	<div class="alert alert-error">{{ error() }}</div>
+	<a routerLink="/topics" class="btn btn-ghost">← Back to topics</a>
+} @else if (data(); as d) {
+	<div class="layout">
+		<div class="main">
+			<section class="card topic-header">
+				<img class="cover" [src]="'/images/topics-images/' + d.topic.imageName" [alt]="d.topic.name" />
+				<div>
+					<h1>{{ d.topic.name }}</h1>
+					<p>{{ d.topic.description }}</p>
+					<p class="meta-row muted">
+						<span>Created by</span>
+						<a [routerLink]="['/users', d.topic.user.id]">{{ d.topic.user.firstName }} {{ d.topic.user.lastName }}</a>
+						<span>· {{ d.topic.creationDate | date: 'mediumDate' }}</span>
+					</p>
+
+					<div class="actions">
+						@if (auth.currentUser(); as user) {
+							<button
+								type="button"
+								class="btn btn-ghost btn-follow"
+								[class.is-following]="d.topic.isFollowing"
+								(click)="toggleFollow()"
+							>
+								{{ d.topic.isFollowing ? '✓ Following' : '+ Follow' }}
+								({{ d.topic.followerCount }})
+							</button>
+							<button type="button" class="btn btn-primary" (click)="askFormOpen.set(!askFormOpen())">
+								{{ askFormOpen() ? 'Cancel' : 'Ask a question' }}
+							</button>
+						} @else {
+							<span class="muted">{{ d.topic.followerCount }} follower(s)</span>
+							<a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/topics/' + d.topic.id }" class="btn btn-primary">Log in to join in</a>
+						}
+					</div>
+				</div>
+			</section>
+
+			@if (askFormOpen()) {
+				<section class="card ask-form">
+					<h2>Ask a question in {{ d.topic.name }}</h2>
+					@if (submitError()) {
+						<div class="alert alert-error">{{ submitError() }}</div>
+					}
+					<textarea
+						rows="3"
+						placeholder="Your question (at least 10 characters)…"
+						[disabled]="submitting()"
+						[value]="newQuestion()"
+						(input)="newQuestion.set($any($event.target).value)"
+					></textarea>
+					<button type="button" class="btn btn-success" [disabled]="submitting() || newQuestion().trim().length < 10" (click)="submitQuestion()">
+						{{ submitting() ? 'Posting…' : 'Post question' }}
+					</button>
+				</section>
+			}
+
+			<section class="card questions-card">
+				<h2>Questions ({{ d.topic.questions.length }})</h2>
+				@if (d.topic.questions.length === 0) {
+					<p class="muted">No questions yet. Be the first to ask one!</p>
+				} @else {
+					@for (question of d.topic.questions; track question.id) {
+						<article class="question-row">
+							<h3><a [routerLink]="['/questions', question.id]">{{ question.content }}</a></h3>
+							<span class="meta-row muted">
+								<img class="avatar-sm" [src]="'/images/users-images/' + question.user.imageName" alt="" />
+								<a [routerLink]="['/users', question.user.id]">{{ question.user.firstName }} {{ question.user.lastName }}</a>
+								· asked {{ question.creationDate | date: 'mediumDate' }}
+							</span>
+							@if (question.firstAnswer; as answer) {
+								<div class="answer-preview">
+									<span class="muted">Top answer by {{ answer.user.firstName }} {{ answer.user.lastName }}:</span>
+									<div [innerHTML]="answer.content | safeContent"></div>
+								</div>
+							}
+						</article>
+					}
+				}
+			</section>
+		</div>
+
+		<aside class="sidebar">
+			<section class="card">
+				<h2>Other topics</h2>
+				@if (d.otherTopics.length === 0) {
+					<p class="muted">Nothing else here yet.</p>
+				} @else {
+					<ul>
+						@for (topic of d.otherTopics; track topic.id) {
+							<li>
+								<a [routerLink]="['/topics', topic.id]">
+									<img [src]="'/images/topics-images/' + topic.imageName" alt="" />
+									{{ topic.name }}
+								</a>
+							</li>
+						}
+					</ul>
+				}
+			</section>
+		</aside>
+	</div>
+}

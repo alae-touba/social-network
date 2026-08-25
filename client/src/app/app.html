@@ -1,0 +1,27 @@
+<nav class="navbar">
+	<div class="navbar-inner">
+		<a routerLink="/topics" class="brand">
+			<img src="favicon.ico" alt="" width="26" height="26" />
+			Q&amp;A Network
+		</a>
+
+		<a routerLink="/topics" routerLinkActive="active" class="nav-link">Topics</a>
+
+		<span class="spacer"></span>
+
+		@if (auth.currentUser(); as user) {
+			<a [routerLink]="['/users', user.id]" class="nav-user">
+				<img class="avatar" [src]="'/images/users-images/' + user.imageName" alt="" />
+				{{ user.firstName }} {{ user.lastName }}
+			</a>
+			<button type="button" class="btn btn-ghost" (click)="auth.logout()">Log out</button>
+		} @else {
+			<a routerLink="/login" class="btn btn-ghost">Log in</a>
+			<a routerLink="/register" class="btn btn-primary">Register</a>
+		}
+	</div>
+</nav>
+
+<main class="page">
+	<router-outlet />
+</main>

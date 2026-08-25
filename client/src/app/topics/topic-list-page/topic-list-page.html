@@ -1,0 +1,37 @@
+<header class="page-header">
+	<h1>Topics</h1>
+	@if (auth.currentUser()) {
+		<a routerLink="/topics/create" class="btn btn-primary">+ Create a topic</a>
+	}
+</header>
+
+<div class="search-box">
+	<input
+		type="search"
+		placeholder="Search topics by name…"
+		aria-label="Search topics"
+		[value]="search()"
+		(input)="search.set($any($event.target).value)"
+	/>
+</div>
+
+@if (loading() || searching()) {
+	<app-loading />
+} @else if (error()) {
+	<div class="alert alert-error">{{ error() }}</div>
+} @else if (topics().length === 0) {
+	<div class="alert alert-info">No topics found{{ search() ? ' for "' + search() + '"' : '' }}.</div>
+} @else {
+	<div class="card-grid">
+		@for (topic of topics(); track topic.id) {
+			<a class="card topic-card" [routerLink]="['/topics', topic.id]">
+				<img class="cover" [src]="'/images/topics-images/' + topic.imageName" alt="" />
+				<span class="card-body">
+					<strong>{{ topic.name }}</strong>
+					<span class="muted">{{ topic.followerCount }} follower(s) · created {{ topic.creationDate | date: 'mediumDate' }}</span>
+					<span class="description">{{ topic.description }}</span>
+				</span>
+			</a>
+		}
+	</div>
+}

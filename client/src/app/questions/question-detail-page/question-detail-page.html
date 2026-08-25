@@ -1,0 +1,93 @@
+@if (loading()) {
+	<app-loading />
+} @else if (error()) {
+	<div class="alert alert-error">{{ error() }}</div>
+	<a routerLink="/topics" class="btn btn-ghost">← Back to topics</a>
+} @else if (question(); as q) {
+	<div class="layout">
+		<div class="main">
+			<section class="card">
+				<h1>{{ q.content }}</h1>
+				<p class="meta-row muted">
+					<img class="avatar-sm" [src]="'/images/users-images/' + q.user.imageName" alt="" />
+					Asked by
+					<a [routerLink]="['/users', q.user.id]">{{ q.user.firstName }} {{ q.user.lastName }}</a>
+					· {{ q.creationDate | date: 'mediumDate' }}
+					· in
+					<a [routerLink]="['/topics', q.topic.id]">{{ q.topic.name }}</a>
+				</p>
+
+				@if (auth.currentUser()) {
+					<button type="button" class="btn btn-primary" (click)="answerFormOpen.set(!answerFormOpen())">
+						{{ answerFormOpen() ? 'Cancel' : 'Write an answer' }}
+					</button>
+				}
+			</section>
+
+			@if (answerFormOpen()) {
+				<section class="card answer-form">
+					@if (submitError()) {
+						<div class="alert alert-error">{{ submitError() }}</div>
+					}
+					<textarea
+						rows="4"
+						placeholder="Share your knowledge…"
+						[disabled]="submitting()"
+						[value]="newAnswer()"
+						(input)="newAnswer.set($any($event.target).value)"
+					></textarea>
+					<button type="button" class="btn btn-success" [disabled]="submitting() || newAnswer().trim().length < 2" (click)="submitAnswer()">
+						{{ submitting() ? 'Posting…' : 'Post answer' }}
+					</button>
+				</section>
+			}
+
+			<section class="card">
+				<h2>Answers ({{ q.answers.length }})</h2>
+				@if (q.answers.length === 0) {
+					<p class="muted">No answers yet. Be the first to answer!</p>
+				} @else {
+					@for (answer of q.answers; track answer.id) {
+						<article class="answer-row">
+							<header class="meta-row">
+								<img class="avatar-sm" [src]="'/images/users-images/' + answer.user.imageName" alt="" />
+								<a [routerLink]="['/users', answer.user.id]">{{ answer.user.firstName }} {{ answer.user.lastName }}</a>
+								<span class="muted">· {{ answer.creationDate | date: 'mediumDate' }}</span>
+							</header>
+							<div class="content" [innerHTML]="answer.content | safeContent"></div>
+							<footer>
+								@if (auth.currentUser()) {
+									<button
+										type="button"
+										class="like-btn"
+										[class.is-liked]="answer.likedByMe"
+										[title]="answer.likedByMe ? 'Unlike' : 'Like'"
+										(click)="toggleLike(answer)"
+									>
+										{{ answer.likedByMe ? '♥' : '♡' }}
+									</button>
+								}
+								<span class="muted">{{ answer.likeCount }} like(s)</span>
+							</footer>
+						</article>
+					}
+				}
+			</section>
+		</div>
+
+		<aside class="sidebar">
+			<section class="card">
+				<h2>Other questions</h2>
+				@if (otherQuestions().length === 0) {
+					<p class="muted">No other questions in this topic.</p>
+				} @else {
+					<ul>
+						@for (item of otherQuestions(); track item.id) {
+							<li><a [routerLink]="['/questions', item.id]">{{ item.content }}</a></li>
+						}
+					</ul>
+				}
+			</section>
+		</aside>
+	</div>
+}
