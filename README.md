@@ -1,346 +1,154 @@
-# Table of content
-- [Table of content](#table-of-content)
-- [About](#about)
-- [Entity Relationship Diagram](#entity-relationship-diagram)
-- [Modeling Data - Relationships Between The 4 Models](#modeling-data---relationships-between-the-4-models)
-- [Mongoose Schemas](#mongoose-schemas)
-- [API](#api)
-- [Use it locally](#use-it-locally)
-  - [Using docker](#using-docker)
-  - [Detailed steps on how to run the application locally in Linux](#detailed-steps-on-how-to-run-the-application-locally-in-linux)
-  - [Detailed steps on how to run the application locally in Windows](#detailed-steps-on-how-to-run-the-application-locally-in-windows)
-- [How It Looks](#how-it-looks)
+# Q&A Network
 
-# About
+A question-and-answer social network where users can create and follow topics, ask questions inside them, answer questions, like answers, and browse other users' profiles.
 
-This is a _question-and-answer_ social network website where users are able to:
+Originally a university project built as a server-rendered Handlebars app, now refactored into a modern two-part architecture:
 
--   Create and follow different topics
--   Ask questions in these topics
--   Answer questions and like/dislike answers.
--   Track other users in the website to see what questions someone asked, what answers he/she gave, which topics they follow, ...etc
+- **Angular SPA** (`client/`) - the entire user interface, consuming the API
+- **Express JSON API** (`server/`) - authentication, business logic, MongoDB access; also serves the built SPA and uploaded images in production
 
+## Features
 
+- Register / log in / log out (session-based auth with bcrypt password hashing)
+- Browse topics with live search, follow/unfollow topics
+- Create topics (optional cover image upload)
+- Ask questions in a topic, answer questions
+- Like/unlike answers (with live counts)
+- User profiles: asked questions, given answers, created topics, followed topics
 
-# Entity Relationship Diagram
-
-Here is the _ERD_ for this app:
-
-![ERD](public/images/readme-images/9.png)
-
-
-# Modeling Data - Relationships Between The 4 Models
-
-A user has many topics (create)\
-A topic belongs to one user \
-=> one to many
-
-A user has many questions (ask) \
-A question belongs to one user \
-=> one to many
-
-A user has many answers (answer) \
-An answer belongs to one user \
-=> one to many
-
-A topic has many questions \
-A question belongs to one topic \
-=> one to many
-
-A question has many answers \
-An answer belongs to one question \
-=> one to many
-
-A user can follow many topics (follow) \
-A topic has many followers \
-=> many to many
-
-An answer has many users who like it \
-A user can like many answers \
-=> many to many
-
-
-# Mongoose Schemas
-
-I use two way (parent & child) referencing for all relationships:
+## Architecture
 
 ```
-User{
-    _id             : ObjectId
-    firstName       : String
-    lastName        : String
-    email           : String
-    password        : String
-    imageName       : String
-    registrationDate: Date
-    topics          : Topic[]       //we store the topics ids
-    questions       : Question[]    //same
-    answers         : Answer[]
-    topicsFollowed  : Topic[]
-    answersLiked    : Answer[]
-}
+┌───────────────┐   /api/*, /images/*    ┌────────────────┐      ┌─────────┐
+│  Angular SPA  │ ─────────────────────► │  Express JSON  │ ───► │ MongoDB │
+│  (client/)    │ ◄───────────────────── │  API (server/) │      └─────────┘
+└───────────────┘   JSON + session cookie └────────────────┘
 ```
 
-```
-Topic{
-    _id             : ObjectId
-    name            : String
-    description     : String
-    imageName       : String
-    creationDate    : Date
-    user            : User
-    questions       : Question[]
-    usersFollowers  : User[]
-}
-```
+### Backend (`server/`)
 
 ```
-Question{
-    _id             : ObjectId
-    content         : String
-    creationDate    : Date
-    topic           : Topic
-    user            : User
-    answers         : Answer[]
-}
+server/
+├── index.js                 # entrypoint: env → DB → HTTP server
+├── app.js                   # express wiring: sessions, routes, SPA hosting, errors
+├── config/
+│   ├── env.js               # environment variables (with dev defaults)
+│   └── passport.js          # local email/password strategy
+├── models/index.js          # Mongoose schemas: User, Topic, Question, Answer
+├── routes/                  # one router per resource (/api/auth, /api/topics, ...)
+├── controllers/             # request handlers, no framework concerns mixed in
+└── middleware/
+    ├── auth.js              # requireAuth (401 instead of redirect)
+    ├── validate.js          # express-validator rules + ObjectId param check
+    ├── upload.js            # multer image uploads (type & size limits)
+    └── errors.js            # HttpError helper used by the central error handler
 ```
 
-```
-Answers{
-    _id             : ObjectId
-    content         : String
-    creationDate    : Date
-    user            : User
-    question        : Question
-    usersWhoLike    : User[]
-}
-```
+### API overview
 
----
+| Method | Route                    | Auth | Description                          |
+| ------ | ------------------------ | ---- | ------------------------------------ |
+| POST   | `/api/auth/register`     | -    | Create account (+ optional image)    |
+| POST   | `/api/auth/login`        | -    | Log in                               |
+| POST   | `/api/auth/logout`       | ✓    | Log out                              |
+| GET    | `/api/auth/me`           | -    | Current session user (204 if none)   |
+| GET    | `/api/topics?search=`    | -    | List/search topics                   |
+| POST   | `/api/topics`            | ✓    | Create topic                         |
+| GET    | `/api/topics/:id`        | -    | Topic detail + questions + sidebar   |
+| POST   | `/api/topics/:id/follow` | ✓    | Toggle follow                        |
+| POST   | `/api/topics/:id/questions` | ✓ | Ask a question                       |
+| GET    | `/api/questions/:id`     | -    | Question + answers + related         |
+| POST   | `/api/questions/:id/answers` | ✓ | Write an answer                    |
+| POST   | `/api/answers/:id/like`  | ✓    | Toggle like                          |
+| GET    | `/api/users/:id`         | -    | Public profile (never includes hashes)|
 
+Errors are always JSON: `{ "message": "...", "details": [...] }` with proper status codes (400 validation, 401 unauthenticated, 404 missing/malformed ids, 409 duplicates).
 
-# API
+### Frontend (`client/`)
 
-```
-GET    /users
-GET    /users/:id
-GET    /users/:id/:content (content == questions | answers | topics | topics-followed)
-GET    /users/register
-GET    /users/login
-POST   /users/register
-POST   /users/login
-DELETE /users/logout
-```
+Angular 20 standalone components with lazy-loaded routes:
 
 ```
-GET    /topics
-GET    /topics/:id
-GET    /topics/create
-POST   /topics/create
-GET    /topics/:id/question
-POST   /topics/:id/question
-DELETE /topics/:id              //NIY
-PATCH  /topics/:id              //NIY
-POST   /topics/follow-infollow  //NIY
+client/src/app/
+├── core/                    # models, AuthService, Topic/Question/Answer/User services, guards
+├── shared/                  # safe-content pipe (sanitized HTML), loading spinner, 404 page
+├── topics/                  # topic list (live search), topic detail (follow + ask), topic form
+├── questions/               # question detail (answers + likes + answer form)
+├── profile/                 # profile page with tabs
+└── auth/                    # login & register pages
 ```
 
-```
-GET    /questions/:id
-GET    /questions/:id/answer
-POST   /questions/:id/answer
-DELETE /questions/:id           //NIY
-PATH   /questions/:id           //NIY
-```
+During development the Angular dev server proxies `/api` and `/images` to the Express server (`client/proxy.conf.json`).
 
-```
-POST   /answers/like-unlike
-GET    /answers/:id             //NIY
-DELETE /answers/:id             //NIY
-PATH   /answers/:id             //NIY
+## Running it
+
+### With Docker (production-style, easiest)
+
+```bash
+docker compose up --build
 ```
 
-(NIY <=> Not Implemented Yet )
+Then open http://localhost:3000. The database is created and seeded automatically on first start. mongo-express (database browser) runs at http://localhost:8082 (login admin/admin).
 
+Demo accounts (email / password):
 
-# Use it locally
+- alae@gmail.com / alae
+- hamza@gmail.com / hamza
+- farid@gmail.com / farid
 
-## Using docker
+### Local development
 
-* Clone the project & unzip it
-* Open the project in the terminal
+Requires Node.js >= 20 and a running MongoDB.
 
-* Run 
-    ```bash
-    docker compose up
-    ```
-
-    if you watch the logs you may see this error:
-
-    ![ERD](public/images/readme-images/mongo-import-error.PNG)
-
-    This is related to EOL (end of line) difference between Windows & Linux systems. If you are cloning the project in Windows Machine, change the EOL for the file [mongodb-database/import-data.sh](./mongodb-database/import-data.sh) to be LF (\n).
-
-    In VSCODE you can do this easily by looking at the bottom menu when the file is opened.
-
-    ![ERD](public/images/readme-images/EOL.PNG)
-
-* Open a browser & head to http://localhost:8082 to see the content of the database (**social_network_db**)
-
-    you should see 4 collections (users, topics, quetions, answers), each one with some data in it.
-    
-    If its not the case, refer to previous step (error may be related to EOL for the [mongodb-database/import-data.sh](./mongodb-database/import-data.sh)).
-
-* Visit http://localhost:3001 to see the app running
-* You can log in to the website with a bunch of existing accounts: 
-    * alae@gmail.com/ alae
-    * hamza@gmail.com/hamza
-    * farid@gmail.com/farid
-
-    or just create one for you instead.
-
-
-## Detailed steps on how to run the application locally in Linux
-
-* To install Nodejs, visit this link https://github.com/nodesource/distributions/blob/master/README.md
-
-    Go to *Debian and Ubuntu based distributions* section and find the wanted Nodejs version and run the commands. For example, if you want to install Nodejs version 12, you will run:
+1. Install dependencies:
 
     ```bash
-    # Using Ubuntu
-    curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-    sudo apt-get install -y nodejs
+    npm run install:all
     ```
 
-* Install MongoDB database via
-    ```bash
-    sudo apt install mongodb
-    ```
-
-* Start the MongoDB service via:
-    ```bash
-    sudo service mongodb start
-    ```
-
-* You can check if MongoDB service is active using:
-    ```bash
-    sudo systemctl status mongodb
-    ```
-
-* Now its time to create the database and its collections, to do this, open the mongo shell using:
-    ```bash
-    mongo
-    ```
-
-* From the mongo shell, run these commands one after another:
-    ```bash
-    use social_network_db
-    db.createCollection('users')
-    db.createCollection('questions')
-    db.createCollection('answers')
-    db.createCollection('topics')
-    ```
-* Download the project into the filesystem 
-
-* Unzip it
-
-* Now we need to import the data into the mongodb database collections
-
-* Open a terminal & go to the downloaded project's directory & run the following commands one after another
-    ```bash
-    mongoimport --db social_network_db --collection users --drop --file ./mongodb-database/users.json --jsonArray
-    ```
+2. Start MongoDB on `localhost:27018` (or adjust `.env` - copy `.env.example` to `.env` first). For example:
 
     ```bash
-    mongoimport --db social_network_db --collection questions --drop --file ./mongodb-database/questions.json --jsonArray
+    docker run -d --name qa-mongo -p 27018:27017 \
+      -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=secret mongo:7
     ```
+
+3. Seed the database (first time only, needs `mongoimport` from the MongoDB Database Tools):
 
     ```bash
-    mongoimport --db social_network_db --collection answers --drop --file ./mongodb-database/answers.json --jsonArray
+    for c in users topics questions answers; do
+      mongoimport --uri "mongodb://root:secret@localhost:27018/social_network_db?authSource=admin" \
+        --collection $c --drop --file database/$c.json --jsonArray
+    done
     ```
-    
+
+4. Run both processes:
+
     ```bash
-    mongoimport --db social_network_db --collection topics --drop --file ./mongodb-database/topics.json --jsonArray
+    npm run dev:server    # terminal 1: API on http://localhost:3000
+    npm run dev:client    # terminal 2: Angular dev server on http://localhost:4200
     ```
-* Always from the project's directory, run 
-    ```bash
-    npm install
-    ```
-    to install npm dependencies
 
-* ALways from the project's directory, run:
-    ```bash
-    npm run startdev
-    ```
-    To run the app
+5. Open http://localhost:4200.
 
-* go to http://locahost:3000
+### Production build (no docker)
 
-* You can log in to the website with a bunch of existing accounts (email/password): 
-    * alae@gmail.com / alae
-    * hamza@gmail.com / hamza
-    * farid@gmail.com / farid
+```bash
+npm install && npm install --prefix client && npm install --prefix server
+npm run build:client       # outputs client/dist/social-network/browser
+npm start                  # serves SPA + API on http://localhost:3000
+```
 
-## Detailed steps on how to run the application locally in Windows
+## Data model
 
+Four collections. Many-to-many relations (topic follows, answer likes) are stored as id arrays on both sides and updated atomically via `$addToSet` / `$pull`. One-to-many lists (a topic's questions, a user's answers, ...) are derived by query rather than duplicated in parent documents.
 
-* MongoDB/Nodejs Download & install
+```
+User    { firstName, lastName, email, password*, imageName, registrationDate,
+          topicsFollowed: [Topic], answersLiked: [Answer] }
+Topic   { name, description, imageName, creationDate, user -> User, usersFollowers: [User] }
+Question{ content, creationDate, user -> User, topic -> Topic }
+Answer  { content, creationDate, user -> User, question -> Question, usersWhoLike: [User] }
+```
 
-    * To download Nodejs for windows, follow the link https://nodejs.org/en/download/ and use the installer and follow the installation steps
-  
-    * Download MongoDB for Windows from the link https://www.mongodb.com/try/download/community
-
-    * Run the .msi file to run the installation wizard (leave everything as default.. default is BEST)
-
-    * Create this directory structure **C:\data\db**
-
-    * Go to MongoDB installation folder and somewhere there in the directory structure you will find a **bin** folder, add it to the *PATH* env variable .
-   
-    * Now we need to download The MongoDB Database Tools (colleciton of command-line utilities for working with MongoDB), to do this head to https://www.mongodb.com/try/download/database-tools?tck=docs_databasetools and download the zip file 
-    
-    * Extract the zip under C:\ drive 
-    
-    * under this zip, you will find a **bin** folder, add it to the *PATH* env variable    
-
-* Running MongoDB server and importing the data into the database
-    * Open cmd and run the MongoDB deamon using this command:
-       
-        ```bash
-        .\mongod.exe
-        ```
-
-    * Now we need to create the database and its collections, open cmd run the MongoDB client
-        ```bash
-        .\mongo.exe
-        ```
-
-    * From the mongo shell that appears, run the following commands one after another
-
-        ```bash
-        use social_network_db
-        db.createCollection('users')
-        db.createCollection('questions')
-        db.createCollection('answers')
-        db.createCollection('topics')
-        ```
-
-    * The rest of the steps to import the data and run the app are the same as in Linux
-
-   
-
-# How It Looks
-
-![ERD](public/images/readme-images/1.png)
-
-![ERD](public/images/readme-images/2.png)
-
-![ERD](public/images/readme-images/3.png)
-
-![ERD](public/images/readme-images/4.png)
-
-![ERD](public/images/readme-images/5.png)
-
-![ERD](public/images/readme-images/6.png)
-
-![ERD](public/images/readme-images/7.png)
-
-![ERD](public/images/readme-images/8.png)
+(*) Passwords are stored as bcrypt hashes and are never included in API responses.

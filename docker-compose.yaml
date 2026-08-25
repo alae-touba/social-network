@@ -1,56 +1,51 @@
-version: "3"
 services:
-    node-server:
-        container_name: node-server
+    api:
         build:
             context: .
             dockerfile: Dockerfile
-        networks:
-            - $NETWORK_NAME
         environment:
-            - DB_HOST=$MONGODB_SERVER
-            - DB_USER=$MONGODB_USER
-            - DB_PASSWORD=$MONGODB_PASSWORD
-            - DB_NAME=$MONGODB_DATABASE
-            - DB_PORT=$MONGODB_DOCKER_PORT
+            - NODE_ENV=production
+            - DB_HOST=mongodb
+            - DB_PORT=27017
+            - DB_USER=${MONGODB_USER:-root}
+            - DB_PASSWORD=${MONGODB_PASSWORD:-secret}
+            - DB_NAME=${MONGODB_DATABASE:-social_network_db}
+            - SESSION_SECRET=${SESSION_SECRET:-change-me-in-production}
         restart: unless-stopped
         ports:
-            - $NODE_HOST_PORT:$NODE_DOCKER_PORT
-        links:
-            - $MONGODB_SERVER
+            - "${APP_PORT:-3000}:3000"
         depends_on:
-            - $MONGODB_SERVER
-    mongodb:
-        container_name: mongodb
-        image: mongo:4.2.23
-        networks:
-            - $NETWORK_NAME
-        restart: unless-stopped
-        ports:
-            - $MONGODB_HOST_PORT:$MONGODB_DOCKER_PORT
-        environment:
-            - MONGO_INITDB_DATABASE=$MONGODB_DATABASE
-            - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
-            - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PASSWORD
-        volumes:
-            - ./mongodb-database/:/docker-entrypoint-initdb.d/
-    mongo-express:
-        container_name: mongo-express
-        image: mongo-express:0.54.0
-        networks:
-            - $NETWORK_NAME
-        restart: unless-stopped
-        ports:
-            - $MONGO_EXPRESS_HOST_PORT:$MONGO_EXPRESS_DOCKER_PORT
-        environment:
-            - ME_CONFIG_MONGODB_SERVER=$MONGODB_SERVER
-            - ME_CONFIG_MONGODB_PORT=$MONGODB_DOCKER_PORT
-            - ME_CONFIG_MONGODB_ADMINUSERNAME=$MONGODB_USER
-            - ME_CONFIG_MONGODB_ADMINPASSWORD=$MONGODB_PASSWORD
-        depends_on:
-            - $MONGODB_SERVER
+            mongodb:
+                condition: service_healthy
 
-networks:
-    node_mongo_mongoexpress_network:
-        name: $NETWORK_NAME
-        driver: bridge
+    mongodb:
+        image: mongo:7
+        restart: unless-stopped
+        ports:
+            - "${MONGODB_HOST_PORT:-27018}:27017"
+        environment:
+            - MONGO_INITDB_DATABASE=${MONGODB_DATABASE:-social_network_db}
+            - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER:-root}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD:-secret}
+        volumes:
+            - ./database:/docker-entrypoint-initdb.d/:ro
+        healthcheck:
+            test: ["CMD", "mongosh", "--quiet", "-u", "root", "-p", "secret", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+            interval: 5s
+            timeout: 5s
+            retries: 12
+
+    mongo-express:
+        image: mongo-express:1.0.2-20
+        restart: unless-stopped
+        ports:
+            - "${MONGO_EXPRESS_PORT:-8082}:8081"
+        environment:
+            - ME_CONFIG_MONGODB_URL=mongodb://${MONGODB_USER:-root}:${MONGODB_PASSWORD:-secret}@mongodb:27017/
+            - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGODB_USER:-root}
+            - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGODB_PASSWORD:-secret}
+            - ME_CONFIG_BASICAUTH_USERNAME=admin
+            - ME_CONFIG_BASICAUTH_PASSWORD=admin
+        depends_on:
+            mongodb:
+                condition: service_healthy
