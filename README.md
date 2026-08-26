@@ -103,7 +103,7 @@ Demo accounts (email / password):
 
 ### Local development
 
-Requires Node.js >= 20 and a running PostgreSQL.
+Requires Node.js >= 20, Docker and npm.
 
 1. Install dependencies:
 
@@ -111,29 +111,38 @@ Requires Node.js >= 20 and a running PostgreSQL.
     npm run install:all
     ```
 
-2. Start PostgreSQL on `localhost:5433` (or adjust `.env` - copy `.env.example` to `.env` first). For example:
+2. Start the database, create the schema and load the demo data — one command:
 
     ```bash
-    docker run -d --name qa-postgres -p 5433:5432 \
-      -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=social_network_db postgres:17-alpine
+    npm run db:init
     ```
 
-3. Create the schema and load the demo data:
+    This runs a Postgres container ([docker-compose.dev.yaml](docker-compose.dev.yaml), data persisted in a named volume), applies the Prisma migrations and seeds demo content only if the database is empty. It also creates `server/.env` from `server/.env.example` on first run. Re-running it is always safe.
+
+    Useful variants:
 
     ```bash
-    cd server
-    npm run migrate:dev     # or: npx prisma migrate deploy
-    npm run seed
+    npm run db:start     # just start/keep Postgres
+    npm run db:stop      # stop it
+    npm run db:seed      # force a full re-import of the demo data
+    npm run db:reset     # drop everything and start over
+    npm run db:migrate   # apply pending migrations
     ```
 
-4. Run both processes:
+3. Run both processes:
 
     ```bash
     npm run dev:server    # terminal 1: API on http://localhost:3000
     npm run dev:client    # terminal 2: Angular dev server on http://localhost:4200
     ```
 
-5. Open http://localhost:4200.
+4. Open http://localhost:4200.
+
+#### Configuration
+
+- `server/.env` - API + Prisma CLI settings (`DATABASE_URL`, session secret, ...). `npm run db:init` creates it from `server/.env.example` automatically; every default matches the dev compose file, so editing it is optional.
+- `.env` (repo root) - optional overrides for the full-stack `docker compose up` (ports, passwords). Copy `.env.example`.
+- During development you can browse the database with `npx prisma studio` from `server/`.
 
 ### Production build (no docker)
 

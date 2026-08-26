@@ -7,6 +7,8 @@
 	"scripts": {
 		"start": "node index.js",
 		"dev": "nodemon index.js",
+		"db:init": "node scripts/ensure-env.js && node scripts/wait-for-db.js && prisma migrate deploy && node scripts/seed.js --if-empty",
+		"db:reset": "prisma migrate reset --force",
 		"migrate:dev": "prisma migrate dev",
 		"migrate:deploy": "prisma migrate deploy",
 		"seed": "prisma db seed"

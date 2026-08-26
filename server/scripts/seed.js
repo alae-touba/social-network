@@ -3,6 +3,10 @@
  * MongoDB app) into PostgreSQL. Idempotent: rows are upserted by id and
  * follows/likes use createMany with skipDuplicates.
  *
+ * Pass --if-empty to skip seeding when the database already has users
+ * (used by `npm run db:init`, so first boot seeds automatically but later
+ * runs never resurrect demo data you may have deleted).
+ *
  * Run via `npm run seed` (prisma db seed) or `node scripts/seed.js`.
  */
 const fs = require("fs")
@@ -10,6 +14,7 @@ const path = require("path")
 const prisma = require("../config/db")
 
 const SEED_DIR = path.resolve(__dirname, "..", "..", "database")
+const IF_EMPTY = process.argv.includes("--if-empty")
 
 function load(name) {
 	const file = path.join(SEED_DIR, `${name}.json`)
@@ -29,6 +34,14 @@ function date(value) {
 }
 
 async function main() {
+	if (IF_EMPTY) {
+		const existingUsers = await prisma.user.count()
+		if (existingUsers > 0) {
+			console.log(`seed: skipped, database already contains ${existingUsers} user(s) (use "npm run db:seed" to force a re-import)`)
+			return
+		}
+	}
+
 	const [users, topics, questions, answers] = [load("users"), load("topics"), load("questions"), load("answers")]
 
 	for (const user of users) {

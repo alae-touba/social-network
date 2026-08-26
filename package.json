@@ -8,7 +8,13 @@
 		"dev:server": "npm run dev --prefix server",
 		"dev:client": "npm start --prefix client",
 		"build:client": "npm run build --prefix client",
-		"start": "npm run start --prefix server"
+		"start": "npm run start --prefix server",
+		"db:init": "npm run db:start && npm run db:init --prefix server",
+		"db:start": "docker compose -f docker-compose.dev.yaml up -d --wait",
+		"db:stop": "docker compose -f docker-compose.dev.yaml down",
+		"db:migrate": "npm run migrate:deploy --prefix server",
+		"db:seed": "npm run seed --prefix server",
+		"db:reset": "npm run db:reset --prefix server"
 	},
 	"engines": {
 		"node": ">=20"
