@@ -2,21 +2,17 @@
 	"name": "social-network",
 	"version": "1.0.0",
 	"private": true,
-	"description": "Q&A social network - Angular SPA + Express JSON API + PostgreSQL",
+	"description": "Q&A social network - Angular SPA + Spring Boot API + PostgreSQL",
 	"scripts": {
-		"install:all": "npm install --prefix server && npm install --prefix client",
-		"dev:server": "npm run dev --prefix server",
+		"install:all": "npm install --prefix client",
+		"dev:server": "cd server && mvn spring-boot:run",
 		"dev:client": "npm start --prefix client",
+		"build:server": "cd server && mvn -q -DskipTests package",
 		"build:client": "npm run build --prefix client",
-		"start": "npm run start --prefix server",
-		"db:init": "npm run db:start && npm run db:init --prefix server",
+		"start": "java -jar server/target/qa-network-server.jar",
+		"db:init": "npm run db:start",
 		"db:start": "docker compose -f docker-compose.dev.yaml up -d --wait",
 		"db:stop": "docker compose -f docker-compose.dev.yaml down",
-		"db:migrate": "npm run migrate:deploy --prefix server",
-		"db:seed": "npm run seed --prefix server",
-		"db:reset": "npm run db:reset --prefix server"
-	},
-	"engines": {
-		"node": ">=20"
+		"db:reset": "docker compose -f docker-compose.dev.yaml down -v && npm run db:start"
 	}
 }

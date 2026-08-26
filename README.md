@@ -5,11 +5,11 @@ A question-and-answer social network where users can create and follow topics, a
 Originally a university project built as a server-rendered Handlebars app, now refactored into a modern two-part architecture:
 
 - **Angular SPA** (`client/`) - the entire user interface, consuming the API
-- **Express JSON API** (`server/`) - authentication, business logic, PostgreSQL access (via Prisma); also serves the built SPA and uploaded images in production
+- **Spring Boot JSON API** (`server/`, Java 17 + Maven) - authentication (JWT), business logic, PostgreSQL access (JPA/Hibernate + Flyway); also serves the built SPA and uploaded images in production
 
 ## Features
 
-- Register / log in / log out (session-based auth with bcrypt password hashing)
+- Register / log in / log out (JWT bearer tokens, bcrypt password hashing)
 - Browse topics with live search, follow/unfollow topics
 - Create topics (optional cover image upload)
 - Ask questions in a topic, answer questions
@@ -19,44 +19,41 @@ Originally a university project built as a server-rendered Handlebars app, now r
 ## Architecture
 
 ```
-┌───────────────┐   /api/*, /images/*    ┌────────────────┐   ┌───────────┐
-│  Angular SPA  │ ─────────────────────► │  Express JSON  │──►│ PostgreSQL│
-│  (client/)    │ ◄───────────────────── │  API (server/) │   └───────────┘
-└───────────────┘   JSON + session cookie └────────────────┘
+┌───────────────┐   /api/*, /images/*      ┌─────────────────┐   ┌───────────┐
+│  Angular SPA  │ ───────────────────────► │ Spring Boot API │──►│ PostgreSQL│
+│  (client/)    │ ◄─────────────────────── │ (server/, Java) │   └───────────┘
+└───────────────┘  JSON + Bearer JWT       └─────────────────┘
 ```
 
 ### Backend (`server/`)
 
+Spring Boot 4, Maven build (`mvn spring-boot:run` / `mvn package`):
+
 ```
-server/
-├── index.js                 # entrypoint: env → DB → HTTP server
-├── app.js                   # express wiring: sessions, routes, SPA hosting, errors
-├── config/
-│   ├── env.js               # environment variables (with dev defaults)
-│   ├── db.js                # shared Prisma client instance
-│   └── passport.js          # local email/password strategy
-├── prisma/
-│   ├── schema.prisma        # tables: users, topics, questions, answers, follows, likes
-│   └── migrations/          # generated SQL migrations (applied via `prisma migrate`)
-├── scripts/seed.js          # imports database/*.json demo data into Postgres
-├── routes/                  # one router per resource (/api/auth, /api/topics, ...)
-├── controllers/             # request handlers, no framework concerns mixed in
-└── middleware/
-    ├── auth.js              # requireAuth (401 instead of redirect)
-    ├── validate.js          # express-validator rules + id param check
-    ├── upload.js            # multer image uploads (type & size limits)
-    ├── serializers.js       # stable API response shapes, no sensitive fields
-    └── errors.js            # HttpError helper used by the central error handler
+server/src/main/java/com/qanetwork/
+├── config/          # AppProperties, SecurityConfig (JWT filter chain), WebConfig (static files + SPA hosting)
+├── security/        # JwtService (issue/verify HS256 tokens), JwtAuthFilter
+├── domain/          # JPA entities: User, Topic, Question, Answer, Follow, Like (+ Role enum)
+├── repository/      # Spring Data repositories
+├── dto/             # request/response records - stable JSON shapes for the SPA
+├── service/         # business logic (auth, topics, questions, profile, uploads)
+├── exception/       # ApiException + global JSON error handler
+└── web/             # REST controllers under /api
+
+server/src/main/resources/
+├── application.yml  # configuration with dev defaults (env vars override)
+└── db/migration/    # Flyway migrations: V1 schema, V2 user roles, V3 demo data
 ```
+
+Authentication is stateless: `POST /api/auth/login` and `/register` return `{ token, user }`; the SPA stores the token and sends it as `Authorization: Bearer <token>`. Passwords are bcrypt-hashed and never leave the server. Users have a `role` column (`USER`; `ADMIN` exists for future moderation features but nothing requires it today).
 
 ### API overview
 
 | Method | Route                    | Auth | Description                          |
 | ------ | ------------------------ | ---- | ------------------------------------ |
-| POST   | `/api/auth/register`     | -    | Create account (+ optional image)    |
-| POST   | `/api/auth/login`        | -    | Log in                               |
-| POST   | `/api/auth/logout`       | ✓    | Log out                              |
-| GET    | `/api/auth/me`           | -    | Current session user (204 if none)   |
+| POST   | `/api/auth/register`     | -    | Create account (+ optional image), returns `{token,user}` |
+| POST   | `/api/auth/login`        | -    | Log in, returns `{token,user}`       |
+| GET    | `/api/auth/me`           | Bearer | Current user (204 when anonymous)  |
 | GET    | `/api/topics?search=`    | -    | List/search topics                   |
 | POST   | `/api/topics`            | ✓    | Create topic                         |
 | GET    | `/api/topics/:id`        | -    | Topic detail + questions + sidebar   |
@@ -67,7 +64,9 @@ server/
 | POST   | `/api/answers/:id/like`  | ✓    | Toggle like                          |
 | GET    | `/api/users/:id`         | -    | Public profile (never includes hashes)|
 
-Errors are always JSON: `{ "message": "...", "details": [...] }` with proper status codes (400 validation, 401 unauthenticated, 404 missing/malformed ids, 409 duplicates).
+There is no logout endpoint: JWTs are stateless, so logging out simply discards the token client-side.
+
+Errors are always JSON: `{ "message": "...", "details": [...] }` with proper status codes (400 validation, 401 unauthenticated, 404 missing ids, 409 duplicates).
 
 ### Frontend (`client/`)
 
@@ -83,7 +82,7 @@ client/src/app/
 └── auth/                    # login & register pages
 ```
 
-During development the Angular dev server proxies `/api` and `/images` to the Express server (`client/proxy.conf.json`).
+During development the Angular dev server proxies `/api` and `/images` to the Spring Boot server (`client/proxy.conf.json`).
 
 ## Running it
 
@@ -103,30 +102,28 @@ Demo accounts (email / password):
 
 ### Local development
 
-Requires Node.js >= 20, Docker and npm.
+Requires Node.js >= 20 (for the Angular CLI), Java 17+ and Maven, plus Docker for the database.
 
-1. Install dependencies:
+1. Install client dependencies:
 
     ```bash
     npm run install:all
     ```
 
-2. Start the database, create the schema and load the demo data — one command:
+2. Start the database:
 
     ```bash
     npm run db:init
     ```
 
-    This runs a Postgres container ([docker-compose.dev.yaml](docker-compose.dev.yaml), data persisted in a named volume), applies the Prisma migrations and seeds demo content only if the database is empty. It also creates `server/.env` from `server/.env.example` on first run. Re-running it is always safe.
+    This runs a Postgres container ([docker-compose.dev.yaml](docker-compose.dev.yaml), data persisted in a named volume). The schema and demo data are created automatically the first time the API starts - Flyway applies the migrations in [server/src/main/resources/db/migration](server/src/main/resources/db/migration) on boot.
 
     Useful variants:
 
     ```bash
     npm run db:start     # just start/keep Postgres
     npm run db:stop      # stop it
-    npm run db:seed      # force a full re-import of the demo data
-    npm run db:reset     # drop everything and start over
-    npm run db:migrate   # apply pending migrations
+    npm run db:reset     # wipe the volume and start over
     ```
 
 3. Run both processes:
@@ -140,24 +137,25 @@ Requires Node.js >= 20, Docker and npm.
 
 #### Configuration
 
-- `server/.env` - API + Prisma CLI settings (`DATABASE_URL`, session secret, ...). `npm run db:init` creates it from `server/.env.example` automatically; every default matches the dev compose file, so editing it is optional.
-- `.env` (repo root) - optional overrides for the full-stack `docker compose up` (ports, passwords). Copy `.env.example`.
-- During development you can browse the database with `npx prisma studio` from `server/`.
+- `server/.env` (optional) - backend settings (`PORT`, `DATABASE_URL`, `JWT_SECRET`, ...), loaded by Spring Boot automatically; copy `server/.env.example`. Defaults match the dev compose file. Real environment variables take precedence.
+- `.env` (repo root, optional) - overrides for the full-stack `docker compose up` (ports, passwords). Copy `.env.example`.
+- During development you can browse the database with Adminer (part of the full-stack compose file) or any SQL client.
 
 ### Production build (no docker)
 
 ```bash
-npm install && npm install --prefix client && npm install --prefix server
+npm install --prefix client
 npm run build:client       # outputs client/dist/social-network/browser
+npm run build:server       # outputs server/target/qa-network-server.jar
 npm start                  # serves SPA + API on http://localhost:3000
 ```
 
 ## Data model
 
-Relational schema managed by Prisma (see `server/prisma/schema.prisma`). The many-to-many relations live in dedicated join tables whose composite primary keys make duplicate follows/likes impossible; all other relations are plain foreign keys.
+Relational schema managed by Flyway migrations (see `server/src/main/resources/db/migration`). The many-to-many relations live in dedicated join tables whose composite primary keys make duplicate follows/likes impossible; all other relations are plain foreign keys.
 
 ```
-users(id, firstName, lastName, email UNIQUE, password*, imageName, registrationDate)
+users(id, firstName, lastName, email UNIQUE, password*, imageName, registrationDate, role)
 topics(id, name UNIQUE, description, imageName, creationDate, userId -> users)
 questions(id, content, creationDate, userId -> users, topicId -> topics)
 answers(id, content, creationDate, userId -> users, questionId -> questions)
@@ -167,4 +165,4 @@ likes(userId -> users, answerId -> answers)     primary key (userId, answerId)
 
 (*) Passwords are stored as bcrypt hashes and are never included in API responses.
 
-The original MongoDB export in `database/*.json` is kept as the seed source: `npm run seed` imports it into Postgres.
+The original MongoDB export in `database/*.json` is kept as provenance: it was converted into the `V3__seed_demo_data.sql` migration that seeds the demo content.

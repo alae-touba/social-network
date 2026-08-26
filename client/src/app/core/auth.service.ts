@@ -2,9 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { setToken } from './token';
 import { User } from './models';
 
 interface AuthResponse {
+	token?: string;
 	user: User;
 }
 
@@ -22,8 +24,13 @@ export class AuthService {
 	ensureLoaded(): Promise<boolean> {
 		this.loadPromise ??= firstValueFrom(this.http.get<AuthResponse | null>('/api/auth/me'))
 			.then((response) => {
-				this.currentUser.set(response?.user ?? null);
-				return true;
+				if (response?.user) {
+					this.currentUser.set(response.user);
+					return true;
+				}
+				// 204 or an expired/invalid token: treat as anonymous.
+				setToken(null);
+				return false;
 			})
 			.catch(() => false);
 		return this.loadPromise;
@@ -35,6 +42,7 @@ export class AuthService {
 
 	async login(email: string, password: string): Promise<User> {
 		const response = await firstValueFrom(this.http.post<AuthResponse>('/api/auth/login', { email, password }));
+		setToken(response.token ?? null);
 		this.currentUser.set(response.user);
 		return response.user;
 	}
@@ -49,12 +57,14 @@ export class AuthService {
 			body.set('image', image);
 		}
 		const response = await firstValueFrom(this.http.post<AuthResponse>('/api/auth/register', body));
+		setToken(response.token ?? null);
 		this.currentUser.set(response.user);
 		return response.user;
 	}
 
 	async logout(): Promise<void> {
-		await firstValueFrom(this.http.post('/api/auth/logout', {})).catch(() => undefined);
+		// JWTs are stateless: dropping the token client-side is the whole logout.
+		setToken(null);
 		this.currentUser.set(null);
 		void this.router.navigate(['/topics']);
 	}

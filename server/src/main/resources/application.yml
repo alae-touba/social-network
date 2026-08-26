@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: qa-network-server
+
+  # Optional local env file (see server/.env.example); real env vars win.
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5433/social_network_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:secret}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        globally_quoted_identifiers: true
+
+  flyway:
+    baseline-on-migrate: false
+
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
+
+server:
+  port: ${PORT:3000}
+  error:
+    whitelabel:
+      enabled: false
+
+app:
+  jwt:
+    # HS256 secret; override with a strong random value in production (min 32 chars)
+    secret: ${JWT_SECRET:dev-only-insecure-secret-change-me-0123456789abcdef}
+    ttl-days: 7
+  images-dir: ${IMAGES_DIR:./public/images}
+  spa-dir: ${SPA_DIR:../client/dist/social-network/browser}

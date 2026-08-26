@@ -4,9 +4,11 @@ services:
             context: .
             dockerfile: Dockerfile
         environment:
-            - NODE_ENV=production
-            - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-secret}@postgres:5432/${POSTGRES_DB:-social_network_db}?schema=public
-            - SESSION_SECRET=${SESSION_SECRET:-change-me-in-production}
+            - SPRING_PROFILES_ACTIVE=prod
+            - DATABASE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-social_network_db}
+            - DB_USERNAME=postgres
+            - DB_PASSWORD=${POSTGRES_PASSWORD:-secret}
+            - JWT_SECRET=${JWT_SECRET:-change-me-in-production-0123456789abcdef}
         restart: unless-stopped
         ports:
             - "${APP_PORT:-3000}:3000"
