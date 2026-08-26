@@ -1,11 +1,11 @@
 const fs = require("fs")
-const mongoose = require("mongoose")
+const prisma = require("./config/db")
 const env = require("./config/env")
 const { createApp } = require("./app")
 
 async function main() {
-	await mongoose.connect(env.db.uri)
-	console.log(`Connected to database "${env.db.name}"`)
+	await prisma.$connect()
+	console.log("Connected to PostgreSQL")
 
 	const app = createApp()
 	app.listen(env.port, () => {

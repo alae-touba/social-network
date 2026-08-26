@@ -5,7 +5,7 @@ A question-and-answer social network where users can create and follow topics, a
 Originally a university project built as a server-rendered Handlebars app, now refactored into a modern two-part architecture:
 
 - **Angular SPA** (`client/`) - the entire user interface, consuming the API
-- **Express JSON API** (`server/`) - authentication, business logic, MongoDB access; also serves the built SPA and uploaded images in production
+- **Express JSON API** (`server/`) - authentication, business logic, PostgreSQL access (via Prisma); also serves the built SPA and uploaded images in production
 
 ## Features
 
@@ -19,9 +19,9 @@ Originally a university project built as a server-rendered Handlebars app, now r
 ## Architecture
 
 ```
-┌───────────────┐   /api/*, /images/*    ┌────────────────┐      ┌─────────┐
-│  Angular SPA  │ ─────────────────────► │  Express JSON  │ ───► │ MongoDB │
-│  (client/)    │ ◄───────────────────── │  API (server/) │      └─────────┘
+┌───────────────┐   /api/*, /images/*    ┌────────────────┐   ┌───────────┐
+│  Angular SPA  │ ─────────────────────► │  Express JSON  │──►│ PostgreSQL│
+│  (client/)    │ ◄───────────────────── │  API (server/) │   └───────────┘
 └───────────────┘   JSON + session cookie └────────────────┘
 ```
 
@@ -33,14 +33,19 @@ server/
 ├── app.js                   # express wiring: sessions, routes, SPA hosting, errors
 ├── config/
 │   ├── env.js               # environment variables (with dev defaults)
+│   ├── db.js                # shared Prisma client instance
 │   └── passport.js          # local email/password strategy
-├── models/index.js          # Mongoose schemas: User, Topic, Question, Answer
+├── prisma/
+│   ├── schema.prisma        # tables: users, topics, questions, answers, follows, likes
+│   └── migrations/          # generated SQL migrations (applied via `prisma migrate`)
+├── scripts/seed.js          # imports database/*.json demo data into Postgres
 ├── routes/                  # one router per resource (/api/auth, /api/topics, ...)
 ├── controllers/             # request handlers, no framework concerns mixed in
 └── middleware/
     ├── auth.js              # requireAuth (401 instead of redirect)
-    ├── validate.js          # express-validator rules + ObjectId param check
+    ├── validate.js          # express-validator rules + id param check
     ├── upload.js            # multer image uploads (type & size limits)
+    ├── serializers.js       # stable API response shapes, no sensitive fields
     └── errors.js            # HttpError helper used by the central error handler
 ```
 
@@ -88,7 +93,7 @@ During development the Angular dev server proxies `/api` and `/images` to the Ex
 docker compose up --build
 ```
 
-Then open http://localhost:3000. The database is created and seeded automatically on first start. mongo-express (database browser) runs at http://localhost:8082 (login admin/admin).
+Then open http://localhost:3000. Migrations and demo data are applied automatically on first start. Adminer (database browser) runs at http://localhost:8082 (system: PostgreSQL, server: `postgres`, user: `postgres`, password: `secret`).
 
 Demo accounts (email / password):
 
@@ -98,7 +103,7 @@ Demo accounts (email / password):
 
 ### Local development
 
-Requires Node.js >= 20 and a running MongoDB.
+Requires Node.js >= 20 and a running PostgreSQL.
 
 1. Install dependencies:
 
@@ -106,20 +111,19 @@ Requires Node.js >= 20 and a running MongoDB.
     npm run install:all
     ```
 
-2. Start MongoDB on `localhost:27018` (or adjust `.env` - copy `.env.example` to `.env` first). For example:
+2. Start PostgreSQL on `localhost:5433` (or adjust `.env` - copy `.env.example` to `.env` first). For example:
 
     ```bash
-    docker run -d --name qa-mongo -p 27018:27017 \
-      -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=secret mongo:7
+    docker run -d --name qa-postgres -p 5433:5432 \
+      -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=social_network_db postgres:17-alpine
     ```
 
-3. Seed the database (first time only, needs `mongoimport` from the MongoDB Database Tools):
+3. Create the schema and load the demo data:
 
     ```bash
-    for c in users topics questions answers; do
-      mongoimport --uri "mongodb://root:secret@localhost:27018/social_network_db?authSource=admin" \
-        --collection $c --drop --file database/$c.json --jsonArray
-    done
+    cd server
+    npm run migrate:dev     # or: npx prisma migrate deploy
+    npm run seed
     ```
 
 4. Run both processes:
@@ -141,14 +145,17 @@ npm start                  # serves SPA + API on http://localhost:3000
 
 ## Data model
 
-Four collections. Many-to-many relations (topic follows, answer likes) are stored as id arrays on both sides and updated atomically via `$addToSet` / `$pull`. One-to-many lists (a topic's questions, a user's answers, ...) are derived by query rather than duplicated in parent documents.
+Relational schema managed by Prisma (see `server/prisma/schema.prisma`). The many-to-many relations live in dedicated join tables whose composite primary keys make duplicate follows/likes impossible; all other relations are plain foreign keys.
 
 ```
-User    { firstName, lastName, email, password*, imageName, registrationDate,
-          topicsFollowed: [Topic], answersLiked: [Answer] }
-Topic   { name, description, imageName, creationDate, user -> User, usersFollowers: [User] }
-Question{ content, creationDate, user -> User, topic -> Topic }
-Answer  { content, creationDate, user -> User, question -> Question, usersWhoLike: [User] }
+users(id, firstName, lastName, email UNIQUE, password*, imageName, registrationDate)
+topics(id, name UNIQUE, description, imageName, creationDate, userId -> users)
+questions(id, content, creationDate, userId -> users, topicId -> topics)
+answers(id, content, creationDate, userId -> users, questionId -> questions)
+follows(userId -> users, topicId -> topics)      primary key (userId, topicId)
+likes(userId -> users, answerId -> answers)     primary key (userId, answerId)
 ```
 
 (*) Passwords are stored as bcrypt hashes and are never included in API responses.
+
+The original MongoDB export in `database/*.json` is kept as the seed source: `npm run seed` imports it into Postgres.

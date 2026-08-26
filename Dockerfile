@@ -10,11 +10,15 @@ RUN npm run build
 FROM node:22-alpine
 # Keep the server/client sibling layout so the SPA_DIR default still resolves.
 COPY server/package*.json /app/server/
-RUN cd /app/server && npm ci --omit=dev
+WORKDIR /app/server
+RUN npm ci
 
-COPY server/ /app/server/
+COPY server/ ./
+COPY database/ /app/database/
+# Generate the Prisma Client for this machine and build a small boot script:
+# apply migrations, seed if empty, then start the API.
+RUN npx prisma generate
 COPY --from=client-build /build/client/dist/social-network/browser /app/client/dist/social-network/browser
 
-WORKDIR /app/server
 EXPOSE 3000
-CMD ["node", "index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node scripts/seed.js && node index.js"]

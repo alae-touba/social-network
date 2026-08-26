@@ -1,30 +1,51 @@
-const { User, Topic, Question, Answer } = require("../models")
+const prisma = require("../config/db")
 const { notFound } = require("../middleware/errors")
+const { userBrief } = require("../middleware/serializers")
 
-function answerView(answer, currentUser) {
+const AUTHOR_BRIEF = { select: { id: true, firstName: true, lastName: true, imageName: true } }
+
+function answerView(answer, likedAnswerIds) {
 	return {
 		id: answer.id,
 		content: answer.content,
 		creationDate: answer.creationDate,
 		user: answer.user,
-		likeCount: answer.usersWhoLike.length,
-		likedByMe: currentUser ? currentUser.answersLiked.some((id) => id.equals(answer._id)) : false
+		likeCount: answer._count ? answer._count.likes : 0,
+		likedByMe: likedAnswerIds.has(answer.id)
 	}
+}
+
+async function likedAnswerIds(userId, answerIdFilter) {
+	if (!userId) return new Set()
+	const likes = await prisma.like.findMany({
+		where: { userId, ...(answerIdFilter ? { answerId: { in: answerIdFilter } } : {}) },
+		select: { answerId: true }
+	})
+	return new Set(likes.map((like) => like.answerId))
 }
 
 /** GET /api/questions/:id - question with all its answers and sibling questions. */
 exports.detail = async (req, res, next) => {
 	try {
-		const question = await Question.findById(req.params.id).populate("user", "firstName lastName imageName").populate("topic", "name")
+		const question = await prisma.question.findUnique({
+			where: { id: req.params.id },
+			include: { user: AUTHOR_BRIEF, topic: { select: { id: true, name: true } } }
+		})
 		if (!question) throw notFound("Question not found.")
 
-		const answers = await Answer.find({ question: question._id })
-			.sort({ creationDate: "asc" })
-			.populate("user", "firstName lastName imageName")
-
-		const otherQuestions = await Question.find({ topic: question.topic._id, _id: { $ne: question._id } })
-			.sort({ creationDate: "desc" })
-			.select("content")
+		const [answers, otherQuestions, likedIds] = await Promise.all([
+			prisma.answer.findMany({
+				where: { questionId: question.id },
+				orderBy: { creationDate: "asc" },
+				include: { user: AUTHOR_BRIEF, _count: { select: { likes: true } } }
+			}),
+			prisma.question.findMany({
+				where: { topicId: question.topicId, id: { not: question.id } },
+				orderBy: { creationDate: "desc" },
+				select: { id: true, content: true }
+			}),
+			likedAnswerIds(req.user?.id)
+		])
 
 		res.json({
 			question: {
@@ -33,7 +54,7 @@ exports.detail = async (req, res, next) => {
 				creationDate: question.creationDate,
 				user: question.user,
 				topic: question.topic,
-				answers: answers.map((answer) => answerView(answer, req.user))
+				answers: answers.map((answer) => answerView(answer, likedIds))
 			},
 			otherQuestions
 		})
@@ -45,13 +66,11 @@ exports.detail = async (req, res, next) => {
 /** POST /api/topics/:id/questions - ask a question in a topic (auth). */
 exports.create = async (req, res, next) => {
 	try {
-		const topic = await Topic.findById(req.params.id)
+		const topic = await prisma.topic.findUnique({ where: { id: req.params.id }, select: { id: true } })
 		if (!topic) throw notFound("Topic not found.")
 
-		const question = await Question.create({
-			content: req.body.content,
-			user: req.user.id,
-			topic: topic._id
+		const question = await prisma.question.create({
+			data: { content: req.body.content, userId: req.user.id, topicId: topic.id }
 		})
 
 		res.status(201).json({ question })
@@ -63,40 +82,42 @@ exports.create = async (req, res, next) => {
 /** POST /api/questions/:id/answers - add an answer (auth). */
 exports.createAnswer = async (req, res, next) => {
 	try {
-		const question = await Question.findById(req.params.id)
+		const question = await prisma.question.findUnique({ where: { id: req.params.id }, select: { id: true } })
 		if (!question) throw notFound("Question not found.")
 
-		const answer = await Answer.create({
-			content: req.body.content,
-			user: req.user.id,
-			question: question._id
+		const answer = await prisma.answer.create({
+			data: { content: req.body.content, userId: req.user.id, questionId: question.id }
 		})
 
-		res.status(201).json({ answer: answerView(answer, req.user) })
+		res.status(201).json({
+			answer: answerView(
+				{ ...answer, user: userBrief(req.user), _count: { likes: 0 } },
+				new Set()
+			)
+		})
 	} catch (error) {
 		next(error)
 	}
 }
 
-/** POST /api/answers/:id/like - toggle like (auth), atomically. */
+/** POST /api/answers/:id/like - toggle like (auth). The composite PK in the
+ * likes table makes duplicate entries impossible. */
 exports.toggleLike = async (req, res, next) => {
 	try {
-		const answer = await Answer.findById(req.params.id)
+		const answer = await prisma.answer.findUnique({ where: { id: req.params.id }, select: { id: true } })
 		if (!answer) throw notFound("Answer not found.")
 
-		const wasLiked = answer.usersWhoLike.some((id) => id.equals(req.user._id))
+		const key = { userId_answerId: { userId: req.user.id, answerId: answer.id } }
 
-		const update = wasLiked ? { $pull: { usersWhoLike: req.user._id } } : { $addToSet: { usersWhoLike: req.user._id } }
-		const inverseUpdate = wasLiked ? { $pull: { answersLiked: answer._id } } : { $addToSet: { answersLiked: answer._id } }
+		const existing = await prisma.like.findUnique({ where: key })
+		if (existing) {
+			await prisma.like.delete({ where: key })
+		} else {
+			await prisma.like.create({ data: { userId: req.user.id, answerId: answer.id } }).catch(() => undefined)
+		}
 
-		const [, updatedUser] = await Promise.all([
-			Answer.findByIdAndUpdate(answer._id, update),
-			User.findByIdAndUpdate(req.user._id, inverseUpdate)
-		])
-
-		req.user.answersLiked = updatedUser.answersLiked
-
-		res.json({ isLiked: !wasLiked, likeCount: answer.usersWhoLike.length + (wasLiked ? -1 : 1) })
+		const likeCount = await prisma.like.count({ where: { answerId: answer.id } })
+		res.json({ isLiked: !existing, likeCount })
 	} catch (error) {
 		next(error)
 	}

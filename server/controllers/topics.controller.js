@@ -1,43 +1,36 @@
-const { User, Topic, Question, Answer } = require("../models")
+const prisma = require("../config/db")
 const { notFound } = require("../middleware/errors")
+const { topicSummary } = require("../middleware/serializers")
 
-function topicSummary(topic) {
-	return {
-		id: topic.id,
-		name: topic.name,
-		description: topic.description,
-		imageName: topic.imageName,
-		creationDate: topic.creationDate,
-		followerCount: topic.usersFollowers.length
-	}
-}
+const AUTHOR_BRIEF = { select: { id: true, firstName: true, lastName: true, imageName: true } }
+const WITH_FOLLOWER_COUNT = { include: { _count: { select: { followers: true } } } }
 
 /** GET /api/topics?search= - list all topics, optionally filtered by name. */
 exports.list = async (req, res, next) => {
 	try {
-		const filter = {}
-		if (req.query.search) {
-			// Escape regex metacharacters so user input can't break (or abuse) the query.
-			const escaped = req.query.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-			filter.name = { $regex: escaped, $options: "i" }
-		}
-
-		const topics = await Topic.find(filter)
+		const topics = await prisma.topic.findMany({
+			where: req.query.search ? { name: { contains: req.query.search, mode: "insensitive" } } : {},
+			orderBy: { name: "asc" },
+			...WITH_FOLLOWER_COUNT
+		})
 		res.json(topics.map(topicSummary))
 	} catch (error) {
 		next(error)
 	}
 }
 
-/** POST /api/topics - create a topic (auth). */
+/** POST /api/topics - create a topic (auth). Duplicate names become 409. */
 exports.create = async (req, res, next) => {
 	try {
 		const { name, description } = req.body
-		const topic = await Topic.create({
-			name,
-			description,
-			imageName: req.file ? req.file.filename : "default-topic.svg",
-			user: req.user.id
+		const topic = await prisma.topic.create({
+			data: {
+				name,
+				description,
+				imageName: req.file ? req.file.filename : "default-topic.svg",
+				userId: req.user.id
+			},
+			...WITH_FOLLOWER_COUNT
 		})
 		res.status(201).json({ topic: topicSummary(topic) })
 	} catch (error) {
@@ -52,50 +45,56 @@ exports.create = async (req, res, next) => {
  */
 exports.detail = async (req, res, next) => {
 	try {
-		const topic = await Topic.findById(req.params.id).populate("user", "firstName lastName imageName")
+		const topic = await prisma.topic.findUnique({
+			where: { id: req.params.id },
+			include: { author: AUTHOR_BRIEF, ...WITH_FOLLOWER_COUNT.include }
+		})
 		if (!topic) throw notFound("Topic not found.")
 
-		const questions = await Question.find({ topic: topic.id })
-			.sort({ creationDate: "desc" })
-			.populate("user", "firstName lastName imageName")
+		const questions = await prisma.question.findMany({
+			where: { topicId: topic.id },
+			orderBy: { creationDate: "desc" },
+			include: { user: AUTHOR_BRIEF }
+		})
 
-		const answerIdsByQuestion = new Map()
-		for (const question of questions) {
-			answerIdsByQuestion.set(question.id, [])
-		}
+		const answersByQuestion = new Map(questions.map((question) => [question.id, []]))
 		if (questions.length > 0) {
-			const answers = await Answer.find({ question: { $in: questions.map((q) => q._id) } })
-				.sort({ creationDate: "asc" })
-				.populate("user", "firstName lastName imageName")
+			const answers = await prisma.answer.findMany({
+				where: { questionId: { in: questions.map((q) => q.id) } },
+				orderBy: { creationDate: "asc" },
+				include: { user: AUTHOR_BRIEF, _count: { select: { likes: true } } }
+			})
 			for (const answer of answers) {
-				const questionId = String(answer.question)
-				if (answerIdsByQuestion.has(questionId)) {
-					answerIdsByQuestion.get(questionId).push(answer)
-				}
+				answersByQuestion.get(answer.questionId)?.push(answer)
 			}
 		}
 
 		let isFollowing = false
+		let followedTopicIds = []
 		if (req.user) {
-			isFollowing = req.user.topicsFollowed.some((id) => id.equals(topic._id))
+			const follows = await prisma.follow.findMany({ where: { userId: req.user.id }, select: { topicId: true } })
+			followedTopicIds = follows.map((follow) => follow.topicId)
+			isFollowing = followedTopicIds.includes(topic.id)
 		}
 
 		// Sidebar: everything the user does not already follow (including this topic).
-		const otherTopics = req.user
-			? await Topic.find({ _id: { $nin: [...req.user.topicsFollowed, topic._id] } })
-			: await Topic.find({ _id: { $ne: topic._id } })
+		const otherTopics = await prisma.topic.findMany({
+			where: { id: { notIn: [...followedTopicIds, topic.id] } },
+			orderBy: { name: "asc" },
+			...WITH_FOLLOWER_COUNT
+		})
 
 		res.json({
 			topic: {
 				...topicSummary(topic),
-				user: topic.user,
+				user: topic.author,
 				isFollowing,
 				questions: questions.map((question) => ({
 					id: question.id,
 					content: question.content,
 					creationDate: question.creationDate,
 					user: question.user,
-					firstAnswer: answerIdsByQuestion.get(question.id)[0] ?? null
+					firstAnswer: answersByQuestion.get(question.id)[0] ?? null
 				}))
 			},
 			otherTopics: otherTopics.map(topicSummary)
@@ -105,26 +104,24 @@ exports.detail = async (req, res, next) => {
 	}
 }
 
-/** POST /api/topics/:id/follow - toggle following (auth), atomically. */
+/** POST /api/topics/:id/follow - toggle following (auth). The composite PK in
+ * the follows table makes duplicate entries impossible. */
 exports.toggleFollow = async (req, res, next) => {
 	try {
-		const topic = await Topic.findById(req.params.id)
+		const topic = await prisma.topic.findUnique({ where: { id: req.params.id }, select: { id: true } })
 		if (!topic) throw notFound("Topic not found.")
 
-		const wasFollowing = topic.usersFollowers.some((id) => id.equals(req.user._id))
+		const key = { userId_topicId: { userId: req.user.id, topicId: topic.id } }
 
-		const update = wasFollowing ? { $pull: { usersFollowers: req.user._id } } : { $addToSet: { usersFollowers: req.user._id } }
-		const inverseUpdate = wasFollowing ? { $pull: { topicsFollowed: topic._id } } : { $addToSet: { topicsFollowed: topic._id } }
+		const existing = await prisma.follow.findUnique({ where: key })
+		if (existing) {
+			await prisma.follow.delete({ where: key })
+		} else {
+			await prisma.follow.create({ data: { userId: req.user.id, topicId: topic.id } }).catch(() => undefined)
+		}
 
-		// Atomic array updates: no read-modify-write race, no duplicates.
-		const [, updatedUser] = await Promise.all([
-			Topic.findByIdAndUpdate(topic._id, update),
-			User.findByIdAndUpdate(req.user._id, inverseUpdate)
-		])
-
-		req.user.topicsFollowed = updatedUser.topicsFollowed
-
-		res.json({ isFollowing: !wasFollowing, followerCount: topic.usersFollowers.length + (wasFollowing ? -1 : 1) })
+		const followerCount = await prisma.follow.count({ where: { topicId: topic.id } })
+		res.json({ isFollowing: !existing, followerCount })
 	} catch (error) {
 		next(error)
 	}

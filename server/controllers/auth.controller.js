@@ -1,18 +1,8 @@
 const bcrypt = require("bcryptjs")
 const passport = require("../config/passport")
-const { User } = require("../models")
+const prisma = require("../config/db")
 const { fail } = require("../middleware/errors")
-
-function safeUser(user) {
-	return {
-		id: user.id,
-		firstName: user.firstName,
-		lastName: user.lastName,
-		email: user.email,
-		imageName: user.imageName,
-		registrationDate: user.registrationDate
-	}
-}
+const { safeUser } = require("../middleware/serializers")
 
 /** GET /api/auth/me - current session user, or 204 when anonymous. */
 exports.getCurrentUser = (req, res) => {
@@ -28,17 +18,19 @@ exports.register = async (req, res, next) => {
 	try {
 		const { firstName, lastName, email, password } = req.body
 
-		const existing = await User.findOne({ email: email.toLowerCase() })
+		const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } })
 		if (existing) {
 			fail(409, "An account with this email already exists.")
 		}
 
-		const user = await User.create({
-			firstName,
-			lastName,
-			email,
-			password: await bcrypt.hash(password, 10),
-			imageName: req.file ? req.file.filename : "default-user.svg"
+		const user = await prisma.user.create({
+			data: {
+				firstName,
+				lastName,
+				email: email.toLowerCase(),
+				password: await bcrypt.hash(password, 10),
+				imageName: req.file ? req.file.filename : "default-user.svg"
+			}
 		})
 
 		// Log the new user in right away so the SPA can continue seamlessly.

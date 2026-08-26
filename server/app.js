@@ -71,9 +71,9 @@ function createApp() {
 
 	// eslint-disable-next-line no-unused-vars
 	app.use((error, _req, res, _next) => {
-		const isDuplicateKey = Number(error.code) === 11000
+		const isUniqueViolation = error.code === "P2002" // prisma unique-constraint violation
 		const isMulterLimit = typeof error.code === "string" && error.code.startsWith("LIMIT_")
-		const status = error.status ?? (isDuplicateKey ? 409 : isMulterLimit ? 400 : 500)
+		const status = error.status ?? (isUniqueViolation ? 409 : isMulterLimit ? 400 : 500)
 		if (status >= 500) {
 			console.error(error)
 		}

@@ -1,11 +1,13 @@
-const mongoose = require("mongoose")
 const { body } = require("express-validator")
 const { validationResult } = require("express-validator")
 const { HttpError, notFound } = require("./errors")
 
-/** Route-param middleware: rejects malformed ObjectIds with 404 instead of a CastError 500. */
+// Covers legacy 24-char hex ids as well as the cuids Prisma generates.
+const ID_PATTERN = /^[a-z0-9]{24,25}$/i
+
+/** Route-param middleware: rejects malformed ids with 404 instead of a query error. */
 function validIdParam(req, _res, next, value) {
-	if (mongoose.isValidObjectId(value)) {
+	if (ID_PATTERN.test(value)) {
 		next()
 	} else {
 		next(notFound())
